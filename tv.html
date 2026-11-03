@@ -115,9 +115,9 @@ html,body{height:100%;overflow:hidden;background:#020a06}
 .ticker{position:absolute;left:84px;right:84px;bottom:62px;height:62px;border-top:1px solid rgba(216,178,92,.4);display:flex;align-items:center;overflow:hidden;font-size:28px;color:var(--ink)}
 .ticker .tl{color:var(--gold2);letter-spacing:.2em;margin-right:24px;flex:none}
 .ticker .tx{white-space:nowrap;animation:fadeIn .6s ease}
-.stats{display:flex;gap:30px;margin-top:30px}
-.stats .panel{flex:1;text-align:center;padding:22px}
-.stats .v{font-family:Georgia,serif;font-size:56px;color:var(--gold2);font-weight:700}
+.stats{display:flex;gap:30px;margin-top:20px}
+.stats .panel{flex:1;text-align:center;padding:12px 22px}
+.stats .v{font-family:Georgia,serif;font-size:48px;color:var(--gold2);font-weight:700;line-height:1.2}
 .otb{width:100%;margin-top:12px;border-collapse:collapse;font-size:28px}
 .otb th{color:var(--muted);font-weight:400;font-size:22px;text-align:left;padding:4px 8px;letter-spacing:.2em}
 .otb td{padding:3px 8px;border-bottom:1px solid rgba(216,178,92,.18)}
@@ -135,6 +135,14 @@ html,body{height:100%;overflow:hidden;background:#020a06}
 .flist{position:absolute;left:300px;right:300px;bottom:110px;display:grid;grid-template-columns:1fr 1fr;gap:6px 60px;font-size:30px}
 .flist .it{display:flex;gap:16px;border-bottom:1px solid rgba(216,178,92,.25);padding:6px 0}
 .flist .it .bl{margin-left:auto;font-family:Georgia,serif;color:var(--gold2)}
+.tblp{margin-top:20px;padding:10px 30px}
+.trow{display:flex;align-items:center;gap:20px;padding:6px 0}.trow+.trow{border-top:1px solid rgba(216,178,92,.2)}
+.trow .tn{font-size:28px;width:250px;flex:none;white-space:nowrap}.trow .tr{display:flex;gap:8px;flex-wrap:nowrap;overflow:hidden}
+.trow .live{font-size:18px;background:#c0262d;color:#fff;padding:1px 8px;border-radius:10px;margin-left:10px;vertical-align:4px}
+.rb{display:inline-flex;align-items:center;justify-content:center;min-width:46px;height:46px;padding:0 8px;border-radius:23px;color:#fff;font:700 22px Georgia,var(--serif)}
+.rb.r{background:#b02a30}.rb.b{background:#151515;border:1px solid #666}.rb.g{background:#1b7a45}
+.rb.big{background:#8a2a20}.rb.small{background:#1f4f8a}.rb.tri{background:linear-gradient(180deg,#f6dc8e,#c99a3c);color:#2a1d05}
+.rb.last{box-shadow:0 0 0 3px var(--gold2)}
 #fsHint{position:fixed;right:12px;bottom:10px;color:#6f8a7a;font-size:12px;z-index:5}
 </style>
 </head>
@@ -144,7 +152,7 @@ html,body{height:100%;overflow:hidden;background:#020a06}
   <div class="hd"><div class="t">午 夜 地 下 賭 場</div><div class="s">THE GATSBY CASINO</div></div>
   <div class="main" id="main"></div>
   <div class="side"><h2>今 晚 的 大 亨</h2><div class="lb" id="lb"></div></div>
-  <div class="ticker"><span class="tl">◆ 賭場快訊</span><span class="tx" id="tick">歡迎光臨，出示錢包 QR 即可上桌</span></div>
+  <div class="ticker"><span class="tl">◆ 賭場快訊</span><span class="tx" id="tick">歡迎光臨，拿起手機就能下注</span></div>
   <div id="final"><div class="frame"></div>
     <div class="hd"><div class="t">今 晚 的 大 亨</div><div class="s">THE GREAT GATSBY OF TONIGHT</div></div>
     <div class="fl"><div class="pod" id="fpod"></div></div>
@@ -220,7 +228,17 @@ const GC_DEFAULTS = {
     pay5:    { "7":25, BAR:8, K:4, D:2, S:2, two7:1 },   /* 一條線上三個相同的倍數；two7＝一條線上有兩個 7 */
     weight5: { "7":2,  BAR:4, K:5, D:9, S:9 }            /* 每格出現權重 */
   },
-  chip:   { unit: 100, max: 1000 },             /* 實體桌換籌碼：單位與單次上限 */
+  /* 實體賭桌：荷官現場開局、玩家手機下注、荷官輸入結果後自動派彩（倍數＝拿回，含本金） */
+  tbl: {
+    betSec: 30, maxBet: 500, chips: [50, 100, 200, 500],
+    tables: [ { id: "R1", kind: "roulette", name: "輪盤 1 號桌" }, { id: "S1", kind: "sicbo", name: "骰寶 1 號桌" } ],
+    roulette: { even: 2, col: 3, num: 36 },     /* 大小／單雙／紅黑 1賠1、列注 1賠2、直接注 1賠35 */
+    sicbo: { bs: 2, anyT: 36, tri: 202,         /* 大小 1賠1、任意豹子 1賠35、指定豹子 1賠201 */
+      sum: { s4: 71, s5: 36, s6: 21, s7: 14, s8: 10, s9: 9, s10: 8, s11: 8, s12: 9, s13: 10, s14: 14, s15: 21, s16: 36, s17: 71 } }
+  },
+  /* 21 點（線上，跟電腦莊家）：倍數＝拿回（含本金） */
+  bj: { chips: [50, 100, 200, 500], maxBet: 500,
+        pay: { win: 2, t21: 2.5, bj: 2.5, five: 3 } },   /* 一般贏 1賠1、四張內 21 點 1賠1.5、BlackJack 1賠1.5、五龍 1賠2 */
   ticket: { per: 500, topN: 3 },                /* 每 500 幣換 1 張抽獎券；前 3 名不換券 */
   lockAt: "18:25",                              /* 自動鎖定時間 */
   autoLock: true,
@@ -652,6 +670,100 @@ const BAC = {
   NAME: { P: "閒", B: "莊", T: "和", PP: "閒對", BP: "莊對" }
 };
 
+/* ---------- 實體桌：輪盤（歐式，單一個 0） ---------- */
+const ROUL = {
+  RED: [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36],
+  color(n){ return n === 0 ? "g" : this.RED.includes(n) ? "r" : "b"; },
+  wins(n){
+    const w = ["n" + n];
+    if(n > 0) w.push(this.color(n) === "r" ? "red" : "black", n % 2 ? "odd" : "even", n <= 18 ? "low" : "high", "c" + ((n - 1) % 3 + 1));
+    return w;
+  },
+  mult(k, pay){ return k[0] === "n" ? +pay.num : k[0] === "c" ? +pay.col : +pay.even; },
+  NAME: { red: "紅", black: "黑", odd: "單", even: "雙", low: "小（1–18）", high: "大（19–36）", c1: "第一列", c2: "第二列", c3: "第三列" },
+  label(k){ return this.NAME[k] || (k[0] === "n" ? k.slice(1) + " 號" : k); },
+  resText(n){ return n + (n === 0 ? "" : this.color(n) === "r" ? " 紅" : " 黑"); },
+  rtp(pay){ return { even: 18 / 37 * pay.even, col: 12 / 37 * pay.col, num: pay.num / 37 }; }
+};
+/* ---------- 實體桌：骰寶 ---------- */
+const SICBO = {
+  wins(d){
+    const s = d[0] + d[1] + d[2], tri = d[0] === d[1] && d[1] === d[2], w = [];
+    if(!tri) w.push(s >= 11 ? "big" : "small");
+    if(s >= 4 && s <= 17) w.push("s" + s);
+    if(tri) w.push("anyT", "t" + d[0]);
+    return w;
+  },
+  mult(k, pay){ if(k === "big" || k === "small") return +pay.bs; if(k === "anyT") return +pay.anyT; if(k[0] === "t") return +pay.tri; return +(pay.sum || {})[k] || 0; },
+  label(k){ return k === "big" ? "大" : k === "small" ? "小" : k === "anyT" ? "任意豹子" : k[0] === "t" ? "豹子 " + k.slice(1) : k[0] === "s" ? "總和 " + k.slice(1) : k; },
+  resText(d){ const s = d[0] + d[1] + d[2], tri = d[0] === d[1] && d[1] === d[2]; return d.join("・") + "　" + s + " 點" + (tri ? " 豹子" : s >= 11 ? " 大" : " 小"); },
+  WAYS: (() => { const w = {}; for(let a = 1; a <= 6; a++) for(let b = 1; b <= 6; b++) for(let c = 1; c <= 6; c++){ const s = a + b + c; w[s] = (w[s] || 0) + 1; } return w; })(),
+  rtp(pay){ const o = { bs: 105 / 216 * pay.bs, anyT: 6 / 216 * pay.anyT, tri: pay.tri / 216, sum: {} }; for(let s = 4; s <= 17; s++) o.sum["s" + s] = this.WAYS[s] / 216 * ((pay.sum || {})["s" + s] || 0); return o; }
+};
+const TBL = {
+  R: { roulette: ROUL, sicbo: SICBO },
+  KIND: { roulette: "輪盤", sicbo: "骰寶" },
+  betKeys(b){ return Object.keys(b || {}).filter(k => k !== "nm" && +b[k] > 0); },
+  total(b){ return this.betKeys(b).reduce((a, k) => a + (+b[k] || 0), 0); },
+  payout(kind, b, result, pay){ const R = this.R[kind], w = R.wins(result); let got = 0; this.betKeys(b).forEach(k => { if(w.includes(k)) got += (+b[k] || 0) * R.mult(k, pay); }); return Math.round(got); },
+  resText(kind, result){ return this.R[kind].resText(result); },
+  label(kind, k){ return this.R[kind].label(k); },
+  tableOf(tid){ return (GC.cfg.tbl.tables || []).find(t => t.id === tid); },
+  /* 結算一局（荷官手機送出結果後執行；後台會接手卡住的局）——派彩用一次性旗標，重複執行也不會重複派 */
+  async settle(tid, snap){
+    const t = snap || (GC.state.tables || {})[tid];
+    if(!t || t.phase !== "settling") return;
+    const bets = (await DB.get("tblBets/" + t.id)) || {};
+    let winners = 0, paid = 0;
+    await pool(Object.keys(bets), 25, async pid => {
+      const amt = t.void ? this.total(bets[pid]) : this.payout(t.kind, bets[pid], t.result, t.pay);
+      if(amt <= 0) return;
+      const g = await GC.grant(pid, "tw/" + t.id, amt, t.name + "第" + t.no + "局 " + (t.void ? "作廢退回" : "開 " + this.resText(t.kind, t.result)));
+      if(g === "ok" || g === "dup"){ winners++; paid += amt; }
+    });
+    const res = await DB.tx("state/tables/" + tid, x => x === null ? null : (x.id === t.id && x.phase === "settling" ? Object.assign(x, { phase: "done", doneAt: DB.now(), bettors: Object.keys(bets).length, winners, paid }) : undefined));
+    if(res.committed && !t.void){
+      await DB.tx("state/tblRoad/" + tid, arr => (arr || []).concat([{ no: t.no, r: t.result }]).slice(-30));
+      const big = t.kind === "roulette" ? null : (t.result[0] === t.result[1] && t.result[1] === t.result[2]);
+      if(big) DB.push("feed", { t: "🎲 " + t.name + "開出豹子 " + t.result.join("・") + "！", ts: DB.now() });
+    }
+  }
+};
+
+/* ---------- 21 點（線上，跟電腦莊家） ---------- */
+const BJ = {
+  val(c){ const r = POKER.r(c) + 2; return r === 14 ? 1 : r > 10 ? 10 : r; },
+  total(cs){ let t = 0, a = false; cs.forEach(c => { const v = this.val(c); t += v; if(v === 1) a = true; }); const soft = a && t + 10 <= 21; return { t: soft ? t + 10 : t, soft }; },
+  isBJ(cs){ return cs.length === 2 && this.total(cs).t === 21; },
+  /* 發牌：閒明、莊暗、閒明、莊明 */
+  deal(id, stake){ const d = POKER.deck(); return { id, stake, deck: d.slice(4, 20), p: [d[0], d[2]], d: [d[1], d[3]], st: "play" }; },
+  /* 依目前狀態判斷是否結束；回傳更新後的 hand（st: play / done，res，mult） */
+  step(h, pay){
+    const pt = this.total(h.p).t, dbj = this.isBJ(h.d);
+    const end = (res, mult, dealerPlays) => {
+      if(dealerPlays) while(this.total(h.d).t < 17) h.d.push(h.deck.shift());
+      h.st = "done"; h.res = res; h.mult = mult; return h;
+    };
+    if(this.isBJ(h.p)) return dbj ? end("push", 1) : end("bj", pay.bj);
+    if(pt > 21) return end("bust", 0);
+    if(h.p.length >= 5) return end("five", pay.five);
+    if(pt === 21) return dbj ? end("dbj", 0) : end("t21", pay.t21);
+    if(h.stand){
+      if(dbj) return end("dbj", 0);
+      end("cmp", 0, true);
+      const dt = this.total(h.d).t;
+      if(dt > 21 || pt > dt){ h.res = "win"; h.mult = pay.win; }
+      else if(pt === dt){ h.res = "push"; h.mult = 1; }
+      else { h.res = "lose"; h.mult = 0; }
+      return h;
+    }
+    return h;
+  },
+  hit(h, pay){ h.p.push(h.deck.shift()); return this.step(h, pay); },
+  stand(h, pay){ h.stand = true; return this.step(h, pay); },
+  RES: { bj: "BLACKJACK！", t21: "21 點！", five: "五龍！", win: "你贏了！", push: "平手・退回押注", lose: "莊家贏", bust: "爆牌", dbj: "莊家 BLACKJACK" }
+};
+
 /* ---------- 賽馬：彩池賠率 ---------- */
 const HORSE = {
   STAR_W: { 1: 1, 2: 1.5, 3: 2.3, 4: 3.4, 5: 5 },
@@ -886,6 +998,16 @@ function watchBets(r){
   if(betsUnsub) betsUnsub(); betsUnsub = null; BETS = {}; betsFor = id;
   if(id) betsUnsub = DB.on("pools/" + id, v => { BETS = v || {}; lastKey = ""; });
 }
+/* 實體桌：最近開獎 */
+function tblPanel(){
+  const L = GC.cfg.tbl.tables || [], TS = GC.state.tables || {}, R = GC.state.tblRoad || {}, now = DB.now();
+  if(!L.length) return "";
+  return '<div class="panel tblp">' + L.map(tb => { const t = TS[tb.id], road = (R[tb.id] || []).slice(-10);
+    const st = t && t.phase === "bet" && now < t.closeAt ? '<span class="live">下注中</span>' : "";
+    return '<div class="trow"><span class="tn">' + esc(tb.name) + st + '</span><span class="tr">' + (road.length ? road.map((x, i) => { const last = i === road.length - 1 ? " last" : "";
+      if(tb.kind === "roulette") return '<span class="rb ' + ROUL.color(x.r) + last + '">' + x.r + '</span>';
+      const sm = x.r[0] + x.r[1] + x.r[2], tri = x.r[0] === x.r[1] && x.r[1] === x.r[2]; return '<span class="rb ' + (tri ? "tri" : sm >= 11 ? "big" : "small") + last + '">' + sm + (tri ? "豹" : sm >= 11 ? "大" : "小") + '</span>'; }).join("") : '<span style="color:var(--muted);font-size:22px">尚未開獎</span>') + '</span></div>'; }).join("") + '</div>';
+}
 function tvInfo(r){
   const W = HORSE.WEATHER.find(w => w.id === r.weather);
   return W ? '<div style="font-size:22px;margin-top:6px;color:var(--ink)">天氣：' + W.name + '（' + W.note + '）</div>' : '';
@@ -933,11 +1055,11 @@ function renderMain(){
     } else {
       const nx = nextSchedule();
       const st = (BOARD && BOARD.stats) || {};
-      m.innerHTML = '<div class="panel" style="text-align:center;padding:44px"><div class="h1">午 夜 賽 馬</div>' +
+      m.innerHTML = '<div class="panel" style="text-align:center;padding:30px 44px"><div class="h1">午 夜 賽 馬</div>' +
         '<div class="lbl" style="margin-top:14px">' + (nx ? "下 一 場 " + fmtClock(nx) + " 開 盤" : "今 晚 賽 馬 已 全 部 結 束") + '</div>' +
-        '<div class="big" id="cd" style="margin-top:20px">' + (nx ? "--" : "") + '</div>' +
+        '<div class="big" id="cd" style="margin-top:14px;font-size:120px">' + (nx ? "--" : "") + '</div>' +
         (r && r.phase === "done" && !r.cancelled && r.order ? '<div class="lbl" style="margin-top:22px;font-size:26px">上一場冠軍　' + ball(r.order[0]) + '　' + esc(names[r.order[0]]) + '</div>' : '') + '</div>' +
-        '<div class="stats"><div class="panel"><div class="lbl">入場大亨</div><div class="v">' + money(st.count || 0) + '</div></div><div class="panel"><div class="lbl">全場流通</div><div class="v">' + money(st.sum || 0) + '</div></div></div>';
+        '<div class="stats"><div class="panel"><div class="lbl">入場大亨</div><div class="v">' + money(st.count || 0) + '</div></div><div class="panel"><div class="lbl">全場流通</div><div class="v">' + money(st.sum || 0) + '</div></div></div>' + tblPanel();
     }
   }
   const cd = $("cd");

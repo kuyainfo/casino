@@ -313,6 +313,59 @@ button,input,select{font-family:inherit;font-size:16px}
 .fcards .card.done{animation:pop2 .3s ease}
 @keyframes pop2{50%{transform:scale(1.15)}}
 @media (max-height:620px){ .qrbox svg{width:min(40vw,150px)} .bal{font-size:40px} }
+
+/* ===== 實體賭桌（手機下注） ===== */
+.tsel{display:flex;gap:6px;margin-top:10px;overflow-x:auto}
+.tsel button{flex:1;min-width:max-content;padding:8px 10px;border:1px solid var(--gold);background:transparent;color:var(--gold2);font-size:14px;cursor:pointer;white-space:nowrap}
+.tsel button.on{background:linear-gradient(180deg,#f6dc8e,#d3a94c);color:#2a1d05;font-weight:700}
+.tsel button .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#e9584e;margin-left:5px;vertical-align:1px;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.xroad{display:flex;gap:4px;margin-top:8px;overflow-x:auto;min-height:30px;align-items:center;padding-bottom:2px}
+.xroad .lbl{font-size:12px;color:var(--muted);flex:none;margin-right:2px}
+.rb{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 4px;border-radius:13px;color:#fff;font:700 13px Georgia;flex:none}
+.rb.r{background:#b02a30}.rb.b{background:#151515;border:1px solid #555}.rb.g{background:#1b7a45}
+.rb.big{background:#8a2a20}.rb.small{background:#1f4f8a}.rb.tri{background:linear-gradient(180deg,#f6dc8e,#c99a3c);color:#2a1d05}
+.rb.last{box-shadow:0 0 0 2px var(--gold2)}
+.xres{text-align:center;min-height:0;transition:.3s}
+.xres.on{margin-top:10px;padding:12px 8px;border:1px solid var(--gold);background:radial-gradient(100% 120% at 50% 0%,rgba(243,220,156,.18),rgba(0,0,0,.25));animation:fadeIn .4s ease}
+.xres .rbig{display:inline-flex;align-items:center;justify-content:center;width:74px;height:74px;border-radius:50%;color:#fff;font:700 38px Georgia;box-shadow:0 0 0 3px var(--gold2),0 0 26px rgba(243,220,156,.55);animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+.xres .rbig.r{background:#b02a30}.xres .rbig.b{background:#151515}.xres .rbig.g{background:#1b7a45}
+.xres .dice{display:inline-flex;gap:8px}
+.xres .dice span{width:52px;height:52px;background:#f8f3e6;border-radius:10px;padding:4px;box-shadow:0 3px 10px rgba(0,0,0,.5);animation:pop .5s cubic-bezier(.2,1.6,.4,1) both}
+.xres .dice span:nth-child(2){animation-delay:.12s}.xres .dice span:nth-child(3){animation-delay:.24s}
+.xres .dice svg{display:block;width:100%;height:100%}
+.xres .rt{font-size:18px;color:var(--gold2);margin-top:6px;font-weight:700;letter-spacing:.1em}
+.xres .rn{font:700 clamp(24px,7.5vw,30px) Georgia,var(--serif);color:var(--gold2);margin-top:2px}.xres .rn.lose{color:var(--red)}
+@keyframes pop{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}
+.xboard{margin-top:10px;padding:10px;border-radius:12px;background:radial-gradient(120% 90% at 50% 0%,#1d7a4a,#0f4a2c 60%,#0a3520);box-shadow:inset 0 0 0 2px #a8853a,inset 0 0 30px rgba(0,0,0,.4)}
+.xg{display:grid;gap:4px}
+.xc{position:relative;border:1px solid rgba(255,255,255,.55);border-radius:4px;text-align:center;cursor:pointer;user-select:none;color:#fff;padding:5px 2px;min-height:38px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform .1s}
+.xc:active{transform:scale(.96)}
+.xc .xn{font:700 16px Georgia,var(--serif);line-height:1.1}
+.xc .xo{font-size:10px;color:rgba(255,255,255,.75)}
+.xc .xs{position:absolute;right:-5px;top:-7px;z-index:2;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#f6dc8e;color:#2a1d05;font:700 11px Georgia;display:none;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.xc .xs.on{display:flex}
+#pgTbl #xChips{position:sticky;bottom:0;z-index:5;margin:10px -4px 0;padding:10px 4px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(5,26,17,0),rgba(5,26,17,.92) 30%)}
+.xc.r{background:#9e2329}.xc.b{background:#141414}.xc.g{background:#1b7a45}
+.xc.out{background:rgba(0,0,0,.18)}
+.xc.win{box-shadow:0 0 0 3px var(--gold2),0 0 18px rgba(243,220,156,.8);z-index:1;animation:winz .6s ease 3}
+.xboard.off .xc{opacity:.6;cursor:default}.xboard.off .xc.win{opacity:1}
+.xsec{font-size:11px;color:rgba(255,255,255,.7);letter-spacing:.2em;margin:8px 0 4px}
+.xc .dmini{display:flex;gap:2px}.xc .dmini span{width:15px;height:15px;background:#f8f3e6;border-radius:3px;padding:1px}.xc .dmini svg{display:block;width:100%;height:100%}
+/* ===== 21 點 ===== */
+.bjfelt{position:relative;margin-top:10px;border-radius:14px 14px 50px 50px;padding:14px 10px 22px;text-align:center;
+  background:radial-gradient(120% 90% at 50% 0%,#1d7a4a,#0f4a2c 60%,#0a3520);box-shadow:inset 0 0 0 3px #a8853a,inset 0 0 0 6px #3a2a0c,inset 0 0 40px rgba(0,0,0,.45),0 10px 28px rgba(0,0,0,.45)}
+.bjh .fh-t{font-size:12px;letter-spacing:.2em;color:var(--muted)}
+.bjc{display:flex;justify-content:center;gap:5px;margin-top:6px;min-height:clamp(62px,19vw,84px);align-items:center}
+.bjc .card{width:clamp(42px,13vw,58px)}
+.bjc .card.in{animation:dealIn .45s cubic-bezier(.2,.8,.3,1) both}
+.bjpt{font:700 20px Georgia;color:var(--gold2);min-height:28px;margin-top:4px}
+.bjarc{margin:12px auto;font-size:11px;letter-spacing:.18em;color:rgba(243,220,156,.65);border-top:1px solid rgba(243,220,156,.35);border-bottom:1px solid rgba(243,220,156,.35);padding:4px 0;max-width:280px}
+.bjstake{text-align:center;margin-top:10px;color:var(--muted);font-size:14px}
+.bjstake b{color:var(--gold2);font:700 22px Georgia}
+.bjbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.bjbtns .btn{margin:0}
+.bjrule{margin-top:12px;font-size:12px;color:var(--muted);line-height:1.8;text-align:center}
 </style>
 </head>
 <body>
@@ -354,7 +407,7 @@ button,input,select{font-family:inherit;font-size:16px}
     </div>
     <div class="deco banner" id="hRace"><div><div class="gold" id="hRaceT">午夜賽馬</div><div class="muted" id="hRaceS">—</div></div><div class="cd" id="hRaceCd" style="font-size:22px"></div></div>
     <div class="deco center">
-      <div class="muted" style="letter-spacing:.12em">我的錢包 QR　荷官掃碼／撲克 PK</div>
+      <div class="muted" style="letter-spacing:.12em">我的錢包 QR　撲克 PK 對戰用</div>
       <div class="qrbox" id="hQr"></div>
       <div class="code" id="hCode">----</div>
     </div>
@@ -376,7 +429,8 @@ button,input,select{font-family:inherit;font-size:16px}
     <div class="deco game" data-go="pgBac"><div class="ico">♦</div><div><div class="gname">百家樂<span class="badge" id="lBacBadge" style="display:none">下注中</span></div><div class="gsub" id="lBacSub">全場同步開局</div></div><div class="go">入座</div></div>
     <div class="deco game" data-go="pgSlot"><div class="ico">7</div><div><div class="gname">黃金拉霸</div><div class="gsub" id="lSlotSub">每轉 50・最高 50 倍</div></div><div class="go">開轉</div></div>
     <div class="deco game" data-go="pgHunt"><div class="ico">⌕</div><div><div class="gname">蓋茨比尋寶</div><div class="gsub" id="lHuntSub">已找到 0 / 6 個線索</div></div><div class="go">掃碼</div></div>
-    <div class="deco game" id="lTable"><div class="ico">◎</div><div><div class="gname">實體賭桌</div><div class="gsub">輪盤・21 點｜出示錢包 QR 換籌碼</div></div><div class="go">說明</div></div>
+    <div class="deco game" data-go="pgBj"><div class="ico">21</div><div><div class="gname">二十一點</div><div class="gsub" id="lBjSub">跟莊家比點數・五龍 1 賠 2</div></div><div class="go">入座</div></div>
+    <div class="deco game" data-go="pgTbl"><div class="ico">◎</div><div><div class="gname">實體賭桌<span class="badge" id="lTblBadge" style="display:none">下注中</span></div><div class="gsub" id="lTblSub">輪盤・骰寶｜荷官現場開，手機下注</div></div><div class="go">下注</div></div>
     <div class="muted center" style="margin-top:14px" id="lLock">迎賓結束（18:25）錢包鎖定・結算排行</div>
   </section>
 
@@ -497,6 +551,44 @@ button,input,select{font-family:inherit;font-size:16px}
     <div class="muted center" id="bHint"></div>
   </section>
 
+  <!-- 實體賭桌 -->
+  <section class="page" id="pgTbl">
+    <div class="topbar"><button class="back" data-go="pgLobby">‹ 大廳</button><span class="tag" id="xBal">餘額 0</span></div>
+    <div class="title sm" id="xTitle">實 體 賭 桌</div>
+    <div class="sub" id="xSub">LIVE TABLE</div>
+    <div class="tsel" id="xSel"></div>
+    <div class="row" style="margin-top:10px"><span class="tag" id="xNo">第 — 局</span><span class="tag" id="xMine">已押 0</span></div>
+    <div class="xroad" id="xRoad"></div>
+    <div class="bstat"><span id="xPhase">—</span><span class="bcd" id="xCd">--</span></div>
+    <div class="bbar"><i id="xBar"></i></div>
+    <div class="xres" id="xRes"></div>
+    <div class="xboard off" id="xBoard"></div>
+    <div class="chips" id="xChips"></div>
+    <div class="muted center" id="xHint" style="margin-top:8px"></div>
+  </section>
+
+  <!-- 21 點 -->
+  <section class="page" id="pgBj">
+    <div class="topbar"><button class="back" data-go="pgLobby">‹ 大廳</button><span class="tag" id="jBal">餘額 0</span></div>
+    <div class="title sm">二 十 一 點</div>
+    <div class="sub">BLACKJACK</div>
+    <div class="bjfelt">
+      <div class="bjh"><div class="fh-t">莊 家 DEALER</div><div class="bjc" id="jcD"></div><div class="bjpt" id="jpD">&nbsp;</div></div>
+      <div class="bjarc">BLACKJACK 1 賠 1.5 ・ 莊家 17 點停牌</div>
+      <div class="bjh"><div class="bjpt" id="jpP">&nbsp;</div><div class="bjc" id="jcP"></div><div class="fh-t" style="margin-top:6px">你 PLAYER</div></div>
+    </div>
+    <div class="pkres" id="jRes" style="min-height:44px"></div>
+    <div id="jBetBox">
+      <div class="chips" id="jChips"></div>
+      <button class="btn" id="jDeal">發 牌</button>
+    </div>
+    <div id="jActBox" style="display:none">
+      <div class="bjstake">本局押注 <b id="jStake">0</b></div>
+      <div class="bjbtns"><button class="btn" id="jHit">要 牌</button><button class="btn ghost" id="jStand">停 牌</button></div>
+    </div>
+    <div class="bjrule" id="jRule"></div>
+  </section>
+
   <!-- 尋寶 -->
   <section class="page" id="pgHunt">
     <div class="topbar"><button class="back" data-go="pgLobby">‹ 大廳</button><span class="tag" id="tBal">餘額 0</span></div>
@@ -546,13 +638,6 @@ button,input,select{font-family:inherit;font-size:16px}
   <button class="btn ghost" id="miNo">婉 拒</button>
 </div></div>
 
-<!-- 實體賭桌說明 -->
-<div class="modal" id="mTable"><div class="modal-in">
-  <div class="title sm">實 體 賭 桌</div>
-  <div class="rule"></div>
-  <div style="line-height:1.8" id="mtBody"></div>
-  <button class="btn" onclick="$('mTable').classList.remove('on')">知 道 了</button>
-</div></div>
 
 <div id="bigwin"><div class="bw-coins" id="bwCoins"></div><div class="bw-in"><div class="bw-t" id="bwT">BIG WIN</div><div class="bw-a" id="bwA">0</div><div class="bw-s">點一下繼續</div></div></div>
 <div class="conn" id="conn" style="display:none"></div>
@@ -625,7 +710,17 @@ const GC_DEFAULTS = {
     pay5:    { "7":25, BAR:8, K:4, D:2, S:2, two7:1 },   /* 一條線上三個相同的倍數；two7＝一條線上有兩個 7 */
     weight5: { "7":2,  BAR:4, K:5, D:9, S:9 }            /* 每格出現權重 */
   },
-  chip:   { unit: 100, max: 1000 },             /* 實體桌換籌碼：單位與單次上限 */
+  /* 實體賭桌：荷官現場開局、玩家手機下注、荷官輸入結果後自動派彩（倍數＝拿回，含本金） */
+  tbl: {
+    betSec: 30, maxBet: 500, chips: [50, 100, 200, 500],
+    tables: [ { id: "R1", kind: "roulette", name: "輪盤 1 號桌" }, { id: "S1", kind: "sicbo", name: "骰寶 1 號桌" } ],
+    roulette: { even: 2, col: 3, num: 36 },     /* 大小／單雙／紅黑 1賠1、列注 1賠2、直接注 1賠35 */
+    sicbo: { bs: 2, anyT: 36, tri: 202,         /* 大小 1賠1、任意豹子 1賠35、指定豹子 1賠201 */
+      sum: { s4: 71, s5: 36, s6: 21, s7: 14, s8: 10, s9: 9, s10: 8, s11: 8, s12: 9, s13: 10, s14: 14, s15: 21, s16: 36, s17: 71 } }
+  },
+  /* 21 點（線上，跟電腦莊家）：倍數＝拿回（含本金） */
+  bj: { chips: [50, 100, 200, 500], maxBet: 500,
+        pay: { win: 2, t21: 2.5, bj: 2.5, five: 3 } },   /* 一般贏 1賠1、四張內 21 點 1賠1.5、BlackJack 1賠1.5、五龍 1賠2 */
   ticket: { per: 500, topN: 3 },                /* 每 500 幣換 1 張抽獎券；前 3 名不換券 */
   lockAt: "18:25",                              /* 自動鎖定時間 */
   autoLock: true,
@@ -1057,6 +1152,100 @@ const BAC = {
   NAME: { P: "閒", B: "莊", T: "和", PP: "閒對", BP: "莊對" }
 };
 
+/* ---------- 實體桌：輪盤（歐式，單一個 0） ---------- */
+const ROUL = {
+  RED: [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36],
+  color(n){ return n === 0 ? "g" : this.RED.includes(n) ? "r" : "b"; },
+  wins(n){
+    const w = ["n" + n];
+    if(n > 0) w.push(this.color(n) === "r" ? "red" : "black", n % 2 ? "odd" : "even", n <= 18 ? "low" : "high", "c" + ((n - 1) % 3 + 1));
+    return w;
+  },
+  mult(k, pay){ return k[0] === "n" ? +pay.num : k[0] === "c" ? +pay.col : +pay.even; },
+  NAME: { red: "紅", black: "黑", odd: "單", even: "雙", low: "小（1–18）", high: "大（19–36）", c1: "第一列", c2: "第二列", c3: "第三列" },
+  label(k){ return this.NAME[k] || (k[0] === "n" ? k.slice(1) + " 號" : k); },
+  resText(n){ return n + (n === 0 ? "" : this.color(n) === "r" ? " 紅" : " 黑"); },
+  rtp(pay){ return { even: 18 / 37 * pay.even, col: 12 / 37 * pay.col, num: pay.num / 37 }; }
+};
+/* ---------- 實體桌：骰寶 ---------- */
+const SICBO = {
+  wins(d){
+    const s = d[0] + d[1] + d[2], tri = d[0] === d[1] && d[1] === d[2], w = [];
+    if(!tri) w.push(s >= 11 ? "big" : "small");
+    if(s >= 4 && s <= 17) w.push("s" + s);
+    if(tri) w.push("anyT", "t" + d[0]);
+    return w;
+  },
+  mult(k, pay){ if(k === "big" || k === "small") return +pay.bs; if(k === "anyT") return +pay.anyT; if(k[0] === "t") return +pay.tri; return +(pay.sum || {})[k] || 0; },
+  label(k){ return k === "big" ? "大" : k === "small" ? "小" : k === "anyT" ? "任意豹子" : k[0] === "t" ? "豹子 " + k.slice(1) : k[0] === "s" ? "總和 " + k.slice(1) : k; },
+  resText(d){ const s = d[0] + d[1] + d[2], tri = d[0] === d[1] && d[1] === d[2]; return d.join("・") + "　" + s + " 點" + (tri ? " 豹子" : s >= 11 ? " 大" : " 小"); },
+  WAYS: (() => { const w = {}; for(let a = 1; a <= 6; a++) for(let b = 1; b <= 6; b++) for(let c = 1; c <= 6; c++){ const s = a + b + c; w[s] = (w[s] || 0) + 1; } return w; })(),
+  rtp(pay){ const o = { bs: 105 / 216 * pay.bs, anyT: 6 / 216 * pay.anyT, tri: pay.tri / 216, sum: {} }; for(let s = 4; s <= 17; s++) o.sum["s" + s] = this.WAYS[s] / 216 * ((pay.sum || {})["s" + s] || 0); return o; }
+};
+const TBL = {
+  R: { roulette: ROUL, sicbo: SICBO },
+  KIND: { roulette: "輪盤", sicbo: "骰寶" },
+  betKeys(b){ return Object.keys(b || {}).filter(k => k !== "nm" && +b[k] > 0); },
+  total(b){ return this.betKeys(b).reduce((a, k) => a + (+b[k] || 0), 0); },
+  payout(kind, b, result, pay){ const R = this.R[kind], w = R.wins(result); let got = 0; this.betKeys(b).forEach(k => { if(w.includes(k)) got += (+b[k] || 0) * R.mult(k, pay); }); return Math.round(got); },
+  resText(kind, result){ return this.R[kind].resText(result); },
+  label(kind, k){ return this.R[kind].label(k); },
+  tableOf(tid){ return (GC.cfg.tbl.tables || []).find(t => t.id === tid); },
+  /* 結算一局（荷官手機送出結果後執行；後台會接手卡住的局）——派彩用一次性旗標，重複執行也不會重複派 */
+  async settle(tid, snap){
+    const t = snap || (GC.state.tables || {})[tid];
+    if(!t || t.phase !== "settling") return;
+    const bets = (await DB.get("tblBets/" + t.id)) || {};
+    let winners = 0, paid = 0;
+    await pool(Object.keys(bets), 25, async pid => {
+      const amt = t.void ? this.total(bets[pid]) : this.payout(t.kind, bets[pid], t.result, t.pay);
+      if(amt <= 0) return;
+      const g = await GC.grant(pid, "tw/" + t.id, amt, t.name + "第" + t.no + "局 " + (t.void ? "作廢退回" : "開 " + this.resText(t.kind, t.result)));
+      if(g === "ok" || g === "dup"){ winners++; paid += amt; }
+    });
+    const res = await DB.tx("state/tables/" + tid, x => x === null ? null : (x.id === t.id && x.phase === "settling" ? Object.assign(x, { phase: "done", doneAt: DB.now(), bettors: Object.keys(bets).length, winners, paid }) : undefined));
+    if(res.committed && !t.void){
+      await DB.tx("state/tblRoad/" + tid, arr => (arr || []).concat([{ no: t.no, r: t.result }]).slice(-30));
+      const big = t.kind === "roulette" ? null : (t.result[0] === t.result[1] && t.result[1] === t.result[2]);
+      if(big) DB.push("feed", { t: "🎲 " + t.name + "開出豹子 " + t.result.join("・") + "！", ts: DB.now() });
+    }
+  }
+};
+
+/* ---------- 21 點（線上，跟電腦莊家） ---------- */
+const BJ = {
+  val(c){ const r = POKER.r(c) + 2; return r === 14 ? 1 : r > 10 ? 10 : r; },
+  total(cs){ let t = 0, a = false; cs.forEach(c => { const v = this.val(c); t += v; if(v === 1) a = true; }); const soft = a && t + 10 <= 21; return { t: soft ? t + 10 : t, soft }; },
+  isBJ(cs){ return cs.length === 2 && this.total(cs).t === 21; },
+  /* 發牌：閒明、莊暗、閒明、莊明 */
+  deal(id, stake){ const d = POKER.deck(); return { id, stake, deck: d.slice(4, 20), p: [d[0], d[2]], d: [d[1], d[3]], st: "play" }; },
+  /* 依目前狀態判斷是否結束；回傳更新後的 hand（st: play / done，res，mult） */
+  step(h, pay){
+    const pt = this.total(h.p).t, dbj = this.isBJ(h.d);
+    const end = (res, mult, dealerPlays) => {
+      if(dealerPlays) while(this.total(h.d).t < 17) h.d.push(h.deck.shift());
+      h.st = "done"; h.res = res; h.mult = mult; return h;
+    };
+    if(this.isBJ(h.p)) return dbj ? end("push", 1) : end("bj", pay.bj);
+    if(pt > 21) return end("bust", 0);
+    if(h.p.length >= 5) return end("five", pay.five);
+    if(pt === 21) return dbj ? end("dbj", 0) : end("t21", pay.t21);
+    if(h.stand){
+      if(dbj) return end("dbj", 0);
+      end("cmp", 0, true);
+      const dt = this.total(h.d).t;
+      if(dt > 21 || pt > dt){ h.res = "win"; h.mult = pay.win; }
+      else if(pt === dt){ h.res = "push"; h.mult = 1; }
+      else { h.res = "lose"; h.mult = 0; }
+      return h;
+    }
+    return h;
+  },
+  hit(h, pay){ h.p.push(h.deck.shift()); return this.step(h, pay); },
+  stand(h, pay){ h.stand = true; return this.step(h, pay); },
+  RES: { bj: "BLACKJACK！", t21: "21 點！", five: "五龍！", win: "你贏了！", push: "平手・退回押注", lose: "莊家贏", bust: "爆牌", dbj: "莊家 BLACKJACK" }
+};
+
 /* ---------- 賽馬：彩池賠率 ---------- */
 const HORSE = {
   STAR_W: { 1: 1, 2: 1.5, 3: 2.3, 4: 3.4, 5: 5 },
@@ -1282,7 +1471,7 @@ let waitPk = null, waitUnsub = null, waitTimer = null, invite = null, inviteTime
 let lastRaceToast = null, slotBusy = false, qsDone = false;
 
 /* ---------- 餘額顯示：遊戲結果揭曉前先凍結，揭曉後再滾動到新數字 ---------- */
-const BAL_IDS = ["lBal","rBal","pBal","sBal","tBal","gBal","bBal"];
+const BAL_IDS = ["lBal","rBal","pBal","sBal","tBal","gBal","bBal","xBal","jBal"];
 const balHolds = new Set();
 let balShown = null, balRaf = 0;
 function paintBal(v){ const t = money(v); BAL_IDS.forEach(id => $(id).textContent = "餘額 " + t); const h = $("hBal"); if(h) h.textContent = t; }
@@ -1361,14 +1550,15 @@ async function login(pid){
   $("hCode").textContent = $("pCodeMe").textContent = "編號 " + ME.code;
   /* 從網址帶進來的動作 */
   const pend = (() => { try { return localStorage.getItem(PENDKEY); } catch(e){ return null; } })();
-  const qClue = qsDone ? null : QS.get("clue"), qPk = qsDone ? null : QS.get("pk"); qsDone = true;
+  const qClue = qsDone ? null : QS.get("clue"), qPk = qsDone ? null : QS.get("pk"), qTbl = qsDone ? null : QS.get("tbl"); qsDone = true;
+  if(qTbl && TBL.tableOf(qTbl)){ xTid = qTbl; try { localStorage.setItem("gc_tbl", qTbl); } catch(e){} cleanUrl(); show("pgTbl"); return; }
   if(qClue || pend){ const tk = qClue || pend; try { localStorage.removeItem(PENDKEY); } catch(e){} cleanUrl(); show("pgHunt"); claimClue(tk); return; }
   if(qPk && qPk !== ME.code){ $("pCode").value = qPk; cleanUrl(); show("pgPk"); return; }
   cleanUrl();
   show("pgHome");
 }
 function cleanUrl(){
-  const u = new URL(location.href); ["clue","pk"].forEach(k => u.searchParams.delete(k));
+  const u = new URL(location.href); ["clue","pk","tbl"].forEach(k => u.searchParams.delete(k));
   try { history.replaceState(null, "", u.toString()); } catch(e){}
 }
 
@@ -1397,6 +1587,8 @@ function render(){
   if(CUR === "pgFinal") renderFinal();
   if(CUR === "pgHorse") renderHorse(true);
   if(CUR === "pgBac") renderBac();
+  if(CUR === "pgTbl") renderTbl();
+  if(CUR === "pgBj") renderBj();
   tick();
 }
 
@@ -1417,6 +1609,10 @@ function tick(){
   if(CUR === "pgLobby"){ $("lHorseSub").textContent = (hot ? t : s) + (cd ? "・" + cd.replace(/ /g, "") : ""); $("lHorseBadge").style.display = (r && r.phase === "open" && now < r.closeAt) ? "inline-block" : "none"; }
   if(CUR === "pgHorse") renderHorse(false);
   if(CUR === "pgBac") renderBac();
+  if(CUR === "pgTbl") renderTbl();
+  if(CUR === "pgLobby"){ const TS = GC.state.tables || {}, live = (GC.cfg.tbl.tables || []).filter(tb => { const t = TS[tb.id]; return t && t.phase === "bet" && now < t.closeAt; });
+    $("lTblBadge").style.display = live.length ? "inline-block" : "none";
+    $("lTblSub").textContent = live.length ? live.map(tb => tb.name).join("、") + " 下注中" : "輪盤・骰寶｜荷官現場開，手機下注"; }
   if(CUR === "pgLobby"){ const b = GC.state.bac, v = bacView(b, now); $("lBacBadge").style.display = v === "bet" ? "inline-block" : "none";
     $("lBacSub").textContent = !b ? "全場同步開局" : v === "bet" ? "第 " + b.no + " 局下注中・" + fmtCd(b.closeAt - now).replace(/ /g, "") : "第 " + b.no + " 局開牌中"; }
 }
@@ -1456,15 +1652,6 @@ $("hReliefBtn").onclick = async () => {
     toast(r === "ok" ? "領到救濟金 ＋" + money(c.amount) : r === "dup" ? "救濟金每人限領一次" : "餘額還夠，暫時不能領");
   } catch(e){ toast(e.message); }
   $("hReliefBtn").disabled = false;
-};
-
-/* ---------- 實體賭桌說明 ---------- */
-$("lTable").onclick = () => {
-  const c = GC.cfg.chip;
-  $("mtBody").innerHTML = "① 到輪盤或 21 點桌，出示<span class='gold'>錢包首頁的 QR</span>。<br>" +
-    "② 荷官掃碼後，把大亨幣換成實體籌碼（每次 " + money(c.unit) + " 為單位，最多 " + money(c.max) + "）。<br>" +
-    "③ 離桌前把籌碼交給荷官換回大亨幣。<br><span class='gold'>" + GC.cfg.lockAt + " 錢包鎖定</span>，請在鎖定前換回，才會算進排行。";
-  $("mTable").classList.add("on");
 };
 
 /* ================= 賽馬 ================= */
@@ -2349,6 +2536,217 @@ async function bacBet(z){
 }
 
 
+
+/* ================= 實體賭桌（荷官現場開、手機下注） ================= */
+let xTid = (() => { try { return localStorage.getItem("gc_tbl"); } catch(e){ return null; } })();
+let xBets = {}, xUnsub = null, xFor = null, xChip = null, xBusy = false, xBoardKey = "", xResKey = null;
+function diceSvg(n){
+  const P = { 1: [[50,50]], 2: [[28,28],[72,72]], 3: [[26,26],[50,50],[74,74]], 4: [[28,28],[72,28],[28,72],[72,72]], 5: [[26,26],[74,26],[50,50],[26,74],[74,74]], 6: [[28,24],[72,24],[28,50],[72,50],[28,76],[72,76]] }[n];
+  return '<svg viewBox="0 0 100 100">' + P.map(([x, y]) => '<circle cx="' + x + '" cy="' + y + '" r="' + (n === 1 ? 15 : 10.5) + '" fill="' + (n === 1 || n === 4 ? "#b8262c" : "#1a1a1a") + '"/>').join("") + '</svg>';
+}
+const xTable = () => { const L = GC.cfg.tbl.tables || []; return L.find(t => t.id === xTid) || L[0] || null; };
+function xView(t, now){
+  if(!t) return "none";
+  if(t.phase === "bet") return now < t.closeAt ? "bet" : "closed";
+  if(t.phase === "settling") return t.void ? "closed" : "result";
+  return t.void ? "void" : "result";
+}
+function watchX(t){
+  const id = t ? t.id : null;
+  if(id === xFor) return;
+  if(xUnsub) xUnsub(); xUnsub = null; xBets = {}; xFor = id;
+  if(id && PID) xUnsub = DB.on("tblBets/" + id + "/" + PID, v => { xBets = v || {}; if(CUR === "pgTbl") renderTbl(); });
+}
+function xBoardHtml(kind, pay){
+  const od = m => "1賠" + +(m - 1).toFixed(2);
+  const cell = (k, cls, inner, style) => '<div class="xc ' + cls + '" data-k="' + k + '"' + (style ? ' style="' + style + '"' : "") + '>' + inner + '<span class="xs"></span></div>';
+  if(kind === "roulette"){
+    let h = '<div class="xg" style="grid-template-columns:repeat(3,1fr)">' + cell("n0", "g", '<span class="xn">0</span>', "grid-column:1/-1");
+    for(let n = 1; n <= 36; n++) h += cell("n" + n, ROUL.color(n), '<span class="xn">' + n + '</span>');
+    h += cell("c1", "out", '<span class="xn">2 to 1</span><span class="xo">第一列 ' + od(pay.col) + '</span>') + cell("c2", "out", '<span class="xn">2 to 1</span><span class="xo">第二列 ' + od(pay.col) + '</span>') + cell("c3", "out", '<span class="xn">2 to 1</span><span class="xo">第三列 ' + od(pay.col) + '</span>') + '</div>';
+    h += '<div class="xsec">一 賠 一</div><div class="xg" style="grid-template-columns:repeat(3,1fr)">' +
+      cell("low", "out", '<span class="xn">小</span><span class="xo">1–18</span>') + cell("even", "out", '<span class="xn">雙</span>') + cell("red", "r", '<span class="xn">紅</span>') +
+      cell("black", "b", '<span class="xn">黑</span>') + cell("odd", "out", '<span class="xn">單</span>') + cell("high", "out", '<span class="xn">大</span><span class="xo">19–36</span>') + '</div>';
+    h += '<div class="xsec" style="text-align:center">單一號碼 ' + od(pay.num) + '　｜　開出 0 時，只有押 0 的人贏</div>';
+    return h;
+  }
+  let h = '<div class="xg" style="grid-template-columns:1fr 1fr 1fr">' +
+    cell("small", "out", '<span class="xn">小</span><span class="xo">4–10 ・ ' + od(pay.bs) + '</span>', "min-height:58px") +
+    cell("anyT", "out", '<span class="xn">任意豹子</span><span class="xo">' + od(pay.anyT) + '</span>', "min-height:58px") +
+    cell("big", "out", '<span class="xn">大</span><span class="xo">11–17 ・ ' + od(pay.bs) + '</span>', "min-height:58px") + '</div>';
+  h += '<div class="xsec">加 總 點 數</div><div class="xg" style="grid-template-columns:repeat(7,1fr)">';
+  for(let n = 4; n <= 17; n++) h += cell("s" + n, "out", '<span class="xn">' + n + '</span><span class="xo">' + od((pay.sum || {})["s" + n] || 0).replace("1賠", "1:") + '</span>');
+  h += '</div><div class="xsec">指 定 豹 子 ' + od(pay.tri) + '</div><div class="xg" style="grid-template-columns:repeat(3,1fr)">';
+  for(let n = 1; n <= 6; n++) h += cell("t" + n, "out", '<span class="dmini">' + ('<span>' + diceSvg(n) + '</span>').repeat(3) + '</span>');
+  h += '</div><div class="xsec" style="text-align:center">開出豹子時，押大、押小都算輸</div>';
+  return h;
+}
+function renderTbl(){
+  if(!ME) return;
+  const L = GC.cfg.tbl.tables || [], tb = xTable(), c = GC.cfg.tbl, now = DB.now();
+  if(!tb){ $("xBoard").innerHTML = '<div class="muted center">目前沒有開放的實體桌</div>'; return; }
+  xTid = tb.id;
+  const TS = GC.state.tables || {}, t = TS[tb.id] || null, v = xView(t, now), pay = (t && t.pay) || c[tb.kind];
+  watchX(t);
+  /* 桌別切換 */
+  const sel = L.length > 1 ? L.map(x => { const tt = TS[x.id], live = tt && tt.phase === "bet" && now < tt.closeAt; return '<button data-t="' + esc(x.id) + '"' + (x.id === tb.id ? ' class="on"' : "") + '>' + esc(x.name) + (live ? '<i class="dot"></i>' : "") + '</button>'; }).join("") : "";
+  if($("xSel").dataset.h !== sel){ $("xSel").innerHTML = sel; $("xSel").dataset.h = sel; $$("#xSel button").forEach(b => b.onclick = () => { xTid = b.dataset.t; try { localStorage.setItem("gc_tbl", xTid); } catch(e){} xBoardKey = ""; xResKey = null; renderTbl(); }); }
+  $("xTitle").textContent = tb.kind === "roulette" ? "輪 盤" : "骰 寶"; $("xSub").textContent = (tb.kind === "roulette" ? "ROULETTE" : "SIC BO") + " ・ " + tb.name;
+  $("xNo").textContent = t ? "第 " + t.no + " 局" : "第 — 局";
+  const tot = TBL.total(xBets);
+  $("xMine").textContent = "已押 " + money(tot) + " / " + money(c.maxBet);
+  /* 路單 */
+  const road = ((GC.state.tblRoad || {})[tb.id] || []).slice(-14);
+  const rh = '<span class="lbl">近期</span>' + (road.length ? road.map((x, i) => { const last = i === road.length - 1 ? " last" : "";
+    if(tb.kind === "roulette") return '<span class="rb ' + ROUL.color(x.r) + last + '">' + x.r + '</span>';
+    const sm = x.r[0] + x.r[1] + x.r[2], tri = x.r[0] === x.r[1] && x.r[1] === x.r[2]; return '<span class="rb ' + (tri ? "tri" : sm >= 11 ? "big" : "small") + last + '">' + sm + '</span>'; }).join("") : '<span class="muted" style="font-size:12px">還沒有開獎紀錄</span>');
+  if($("xRoad").dataset.h !== rh){ $("xRoad").innerHTML = rh; $("xRoad").dataset.h = rh; $("xRoad").scrollLeft = 9999; }
+  /* 倒數 */
+  if(v === "none"){ $("xPhase").textContent = "等 待 荷 官 開 局"; $("xCd").textContent = "--"; $("xBar").style.width = "0"; }
+  else if(v === "bet"){ $("xPhase").textContent = "下 注 倒 數"; $("xCd").textContent = fmtCd(t.closeAt - now); $("xBar").style.width = Math.max(0, Math.min(100, (t.closeAt - now) / (t.closeAt - t.openAt) * 100)) + "%"; }
+  else if(v === "closed"){ $("xPhase").textContent = tb.kind === "roulette" ? "停 止 下 注 ・ 荷 官 轉 輪 盤" : "停 止 下 注 ・ 荷 官 開 骰 盅"; $("xCd").textContent = "…"; $("xBar").style.width = "0"; }
+  else if(v === "void"){ $("xPhase").textContent = "本 局 作 廢 ・ 押 注 已 退 回"; $("xCd").textContent = "--"; $("xBar").style.width = "0"; }
+  else { $("xPhase").textContent = t.phase === "done" ? "等 待 下 一 局" : "派 彩 中"; $("xCd").textContent = "--"; $("xBar").style.width = "0"; }
+  /* 下注區 */
+  const bk = tb.kind + JSON.stringify(pay);
+  if(xBoardKey !== bk){ xBoardKey = bk; $("xBoard").innerHTML = xBoardHtml(tb.kind, pay); $$("#xBoard .xc").forEach(e => e.onclick = () => xBet(e.dataset.k)); }
+  $("xBoard").classList.toggle("off", v !== "bet");
+  const wins = v === "result" ? TBL.R[tb.kind].wins(t.result) : [];
+  $$("#xBoard .xc").forEach(e => { const k = e.dataset.k, a = +xBets[k] || 0, sEl = e.querySelector(".xs"); sEl.textContent = a ? (a >= 1000 ? (a / 1000) + "k" : a) : ""; sEl.classList.toggle("on", !!a); e.classList.toggle("win", wins.includes(k)); });
+  /* 籌碼 */
+  if(xChip == null || !c.chips.includes(xChip)) xChip = c.chips[1] || c.chips[0];
+  const chipsHtml = c.chips.map(x => '<div class="chip' + (x === xChip ? " on" : "") + '" data-v="' + x + '">' + x + '</div>').join("");
+  if($("xChips").dataset.h !== chipsHtml){ $("xChips").innerHTML = chipsHtml; $("xChips").dataset.h = chipsHtml; $$("#xChips .chip").forEach(e => e.onclick = () => { xChip = +e.dataset.v; renderTbl(); }); }
+  $("xChips").style.display = v === "bet" ? "flex" : "none";
+  /* 結果 */
+  const rk = v === "result" ? t.id + "|" + tot + "|" + t.phase : v === "void" ? t.id + "void" : "";
+  if(rk !== xResKey){
+    xResKey = rk;
+    if(v === "result"){
+      const got = TBL.payout(tb.kind, xBets, t.result, pay);
+      const pic = tb.kind === "roulette" ? '<span class="rbig ' + ROUL.color(t.result) + '">' + t.result + '</span>' : '<span class="dice">' + t.result.map(n => '<span>' + diceSvg(n) + '</span>').join("") + '</span>';
+      const txt = tb.kind === "roulette" ? (t.result === 0 ? "0（綠）" : t.result + " " + (ROUL.color(t.result) === "r" ? "紅" : "黑") + "・" + (t.result % 2 ? "單" : "雙") + "・" + (t.result <= 18 ? "小" : "大")) : TBL.resText("sicbo", t.result).split("　")[1];
+      $("xRes").innerHTML = pic + '<div class="rt">開出 ' + esc(txt) + '</div>' + (tot ? '<div class="rn' + (got < tot ? " lose" : "") + '">' + (got > tot ? "＋" + money(got - tot) : got === tot ? "押注退回" : "－" + money(tot - got)) + '</div>' : "");
+      $("xRes").classList.add("on");
+    } else if(v === "void"){ $("xRes").innerHTML = '<div class="rt">本局作廢，押注已全額退回</div>'; $("xRes").classList.add("on"); }
+    else { $("xRes").innerHTML = ""; $("xRes").classList.remove("on"); }
+  }
+  $("xHint").textContent = v === "bet" ? "先選籌碼，再點下注區，可以重複點加碼" : v === "closed" ? "看荷官開獎！結果出來後自動派彩" : v === "none" ? "荷官開局後就能下注" : (v === "result" && !tot ? "這局沒有下注" : "");
+}
+async function xBet(k){
+  const c = GC.cfg.tbl, tb = xTable(), t = tb && (GC.state.tables || {})[tb.id], now = DB.now(), amt = xChip;
+  if(xBusy) return;
+  if(GC.state.locked) return toast("已鎖定");
+  if(!t || xView(t, now) !== "bet" || now > t.closeAt - 400) return toast(t && t.phase === "bet" ? "這局已停止下注" : "等荷官開局後才能下注");
+  if(TBL.total(xBets) + amt > c.maxBet) return toast("每局最多押 " + money(c.maxBet));
+  if(ME.bal < amt) return toast("餘額不足");
+  xBusy = true;
+  try {
+    await GC.addBal(PID, -amt, tb.name + "第" + t.no + "局 押" + TBL.label(tb.kind, k));
+    await DB.tx("tblBets/" + t.id + "/" + PID, cur => { const o = cur || {}; o[k] = (+o[k] || 0) + amt; o.nm = ME.name; return o; });
+  } catch(e){ toast(e.message); }
+  xBusy = false;
+}
+
+/* ================= 21 點（跟電腦莊家） ================= */
+let bjH = null, bjChip = null, bjBusy = false, bjShown = { id: null, p: 0, d: 0, hole: false }, bjLoaded = false, bjResT = 0;
+function bjCardHtml(c, cls){ return POKER.html(c).replace('class="card', 'class="card ' + (cls || "")); }
+function bjDraw(h, animate){
+  /* 依序把還沒畫出來的牌補上（有動畫） */
+  if(!h){ $("jcP").innerHTML = $("jcD").innerHTML = ""; $("jpP").innerHTML = $("jpD").innerHTML = "&nbsp;"; bjShown = { id: null, p: 0, d: 0, hole: false }; return 0; }
+  if(bjShown.id !== h.id){ $("jcP").innerHTML = $("jcD").innerHTML = ""; $("jpP").innerHTML = $("jpD").innerHTML = "&nbsp;"; bjShown = { id: h.id, p: 0, d: 0, hole: false }; }
+  const reveal = h.st === "done", q = [];
+  /* 首發：閒、莊（暗）、閒、莊 */
+  const order = [];
+  if(bjShown.p === 0 && bjShown.d === 0){ order.push(["p",0],["d",0],["p",1],["d",1]); for(let i = 2; i < h.p.length; i++) order.push(["p",i]); }
+  else for(let i = bjShown.p; i < h.p.length; i++) order.push(["p",i]);
+  let delay = 0; const step = animate ? 380 : 0;
+  order.forEach(([side, i]) => {
+    if(side === "p" && i < bjShown.p) return; if(side === "d" && i < bjShown.d) return;
+    const hidden = side === "d" && i === 0 && !reveal;
+    q.push([delay, () => { $(side === "p" ? "jcP" : "jcD").insertAdjacentHTML("beforeend", hidden ? '<div class="card back in" data-hole="1"></div>' : bjCardHtml(side === "p" ? h.p[i] : h.d[i], animate ? "in" : "")); }]);
+    delay += step; if(side === "p") bjShown.p = i + 1; else bjShown.d = i + 1;
+  });
+  if(reveal && !bjShown.hole){
+    bjShown.hole = true;
+    q.push([delay, () => { const e = $("jcD").querySelector('[data-hole]'); if(e) e.outerHTML = bjCardHtml(h.d[0], "flip"); else if(!$("jcD").children.length) $("jcD").insertAdjacentHTML("beforeend", bjCardHtml(h.d[0])); }]);
+    delay += animate ? 500 : 0;
+    for(let i = Math.max(bjShown.d, 2); i < h.d.length; i++){ const k = i; q.push([delay, () => $("jcD").insertAdjacentHTML("beforeend", bjCardHtml(h.d[k], animate ? "in" : ""))]); delay += animate ? 600 : 0; }
+    bjShown.d = h.d.length;
+  }
+  q.forEach(([d, f]) => d ? setTimeout(f, d) : f());
+  const pts = () => {
+    const pt = BJ.total(h.p); $("jpP").textContent = (pt.soft && pt.t < 21 ? "軟 " : "") + pt.t + " 點" + (h.p.length >= 5 && pt.t <= 21 ? "・五龍" : "");
+    $("jpD").textContent = reveal ? BJ.total(h.d).t + " 點" : BJ.val(h.d[1]) === 1 ? "明牌 A" : "明牌 " + BJ.total([h.d[1]]).t + " 點";
+  };
+  setTimeout(pts, delay); 
+  return delay;
+}
+function renderBj(){
+  if(!ME) return;
+  const c = GC.cfg.bj;
+  if(!bjLoaded){ bjLoaded = true; DB.get("bj/" + PID).then(h => { if(h && h.id){ bjH = h; bjDraw(h, false); if(h.st === "done") bjFinish(h, 0); } renderBj(); }); }
+  if(bjChip == null || !c.chips.includes(bjChip)) bjChip = c.chips[1] || c.chips[0];
+  const chipsHtml = c.chips.map(x => '<div class="chip' + (x === bjChip ? " on" : "") + '" data-v="' + x + '">' + x + '</div>').join("");
+  if($("jChips").dataset.h !== chipsHtml){ $("jChips").innerHTML = chipsHtml; $("jChips").dataset.h = chipsHtml; $$("#jChips .chip").forEach(e => e.onclick = () => { bjChip = +e.dataset.v; renderBj(); }); }
+  const playing = bjH && bjH.st === "play";
+  $("jBetBox").style.display = playing || bjBusy ? "none" : "block";
+  $("jActBox").style.display = playing ? "block" : "none";
+  $("jDeal").textContent = "發 牌 ・ 押 " + money(bjChip);
+  $("jDeal").disabled = bjBusy || ME.bal < bjChip || GC.state.locked;
+  if(playing) $("jStake").textContent = money(bjH.stake);
+  $("jHit").disabled = $("jStand").disabled = bjBusy;
+  const p = c.pay, od = m => "1 賠 " + +(m - 1).toFixed(2);
+  $("jRule").innerHTML = "一般贏 " + od(p.win) + "・四張內 21 點 " + od(p.t21) + "・BlackJack " + od(p.bj) + "・五龍（五張沒爆）" + od(p.five) + "<br>莊家 17 點以上停牌・平手退回押注・BlackJack 比任何 21 點都大";
+}
+async function bjSave(h){ await DB.set("bj/" + PID, h); }
+async function bjDeal(){
+  const c = GC.cfg.bj, stake = bjChip;
+  if(bjBusy || (bjH && bjH.st === "play")) return;
+  if(GC.state.locked) return toast("已鎖定");
+  if(ME.bal < stake) return toast("餘額不足");
+  bjBusy = true; $("jRes").textContent = ""; $("jRes").className = "pkres"; renderBj();
+  holdBal("bj");
+  try {
+    await GC.addBal(PID, -stake, "21點 押注");
+    let h = BJ.deal("j" + Date.now().toString(36) + rid(3), stake); h.pay = clone(c.pay);
+    h = BJ.step(h, h.pay);
+    bjH = h; await bjSave(h);
+    const d = bjDraw(h, true);
+    if(h.st === "done") await bjFinish(h, d);
+    else setTimeout(() => { bjBusy = false; renderBj(); }, d);
+  } catch(e){ toast(e.message); bjBusy = false; releaseBal("bj"); renderBj(); }
+}
+async function bjAct(kind){
+  if(bjBusy || !bjH || bjH.st !== "play") return;
+  bjBusy = true; renderBj();
+  try {
+    const h = kind === "hit" ? BJ.hit(bjH, bjH.pay) : BJ.stand(bjH, bjH.pay);
+    bjH = h; await bjSave(h);
+    const d = bjDraw(h, true);
+    if(h.st === "done") await bjFinish(h, d);
+    else setTimeout(() => { bjBusy = false; renderBj(); }, d);
+  } catch(e){ toast(e.message); bjBusy = false; renderBj(); }
+}
+async function bjFinish(h, delay){
+  bjBusy = true; holdBal("bj");
+  const amt = Math.round(h.stake * h.mult);
+  try {
+    if(amt > 0) await GC.grant(PID, "bjw/" + h.id, amt, "21點 " + BJ.RES[h.res].replace(/！/g, "") + (amt === h.stake ? "" : " 派彩"));
+    await DB.remove("bj/" + PID);
+  } catch(e){ console.error(e); }
+  setTimeout(() => {
+    const net = amt - h.stake;
+    $("jRes").innerHTML = esc(BJ.RES[h.res]) + '<div class="bnet" style="font-size:clamp(22px,7vw,30px)">' + (net > 0 ? "＋" + money(net) : net === 0 ? "押注退回" : "－" + money(-net)) + '</div>';
+    $("jRes").className = "pkres" + (net < 0 ? " lose" : "");
+    if(h.res === "bj" || h.res === "five") bigWin(h.res === "bj" ? "BLACKJACK" : "五 龍", amt);
+    bjH = null; bjBusy = false; releaseBal("bj"); renderBj();
+  }, delay + 350);
+}
+$("jDeal").onclick = bjDeal;
+$("jHit").onclick = () => bjAct("hit");
+$("jStand").onclick = () => bjAct("stand");
+
 /* ================= 尋寶 ================= */
 const huntCount = () => GC.cfg.hunt.clues.filter(c => ME && ME.hunt && ME.hunt[c.id]).length;
 function renderHunt(){
@@ -2421,6 +2819,7 @@ function renderFinal(){
   if(GC.state.locked) $("bootMsg").textContent = "迎賓賭局已結束";
   else if(QS.get("clue")) $("jErr").textContent = "先開通錢包，線索會自動幫你加上";
   else if(QS.get("pk")) $("jErr").textContent = "先開通錢包，就能跟對方 PK";
+  else if(QS.get("tbl")) $("jErr").textContent = "先開通錢包，就能在這桌下注";
 })();
 </script>
 </body>

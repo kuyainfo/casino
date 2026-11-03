@@ -176,6 +176,11 @@ td.n{text-align:right;font-family:Georgia,serif}
           <div class="btns"><button class="btn" id="bBacOn">開始自動開局</button><button class="btn ghost" id="bBacOff">暫停（打完這局就停）</button></div>
           <div class="muted" style="margin-top:8px" id="bRoadA"></div>
         </div>
+        <div class="box">
+          <h3>實體賭桌（荷官開局）</h3>
+          <table><thead><tr><th>桌別</th><th>局數</th><th>狀態</th><th>最近開獎</th><th></th></tr></thead><tbody id="tblA"></tbody></table>
+          <div class="muted" style="margin-top:8px">荷官手機斷線、卡在「派彩中」超過 8 秒時，這一頁會自動接手派彩。</div>
+        </div>
       </div>
       <div class="grid">
         <div class="box"><h3>賽馬紀錄</h3><table><thead><tr><th>場次</th><th>冠軍</th><th>下注人數</th><th>中獎人數</th><th>派彩</th></tr></thead><tbody id="rLog"></tbody></table></div>
@@ -194,8 +199,6 @@ td.n{text-align:right;font-family:Georgia,serif}
           <label>前幾名頒獎（不換券）</label><input data-k="ticket.topN" type="number">
           <label>自動鎖定時間</label><input data-k="lockAt" type="time">
           <label>自動鎖定</label><select data-k="autoLock"><option value="true">開</option><option value="false">關</option></select>
-          <label>實體桌換籌碼單位</label><input data-k="chip.unit" type="number">
-          <label>單次換出上限</label><input data-k="chip.max" type="number">
         </div></div>
         <div class="box"><h3>午夜賽馬</h3><div class="f">
           <label>開盤時段（逗號分隔）</label><input data-k="horse.times" data-type="list">
@@ -237,6 +240,36 @@ td.n{text-align:right;font-family:Georgia,serif}
           <label>押和贏 拿回（含本金）</label><input data-k="bac.pay.T" type="number" step="0.5">
           <label>押閒對／莊對 拿回（含本金）</label><input data-k="bac.pay.PP" type="number" step="1">
         </div><div class="rtp" id="bRtp"></div><div class="muted" style="margin-top:6px">每局約 = 下注秒數 ＋ 開牌 5～8 秒 ＋ 休息 4 秒</div></div>
+        <div class="box"><h3>實體賭桌（輪盤・骰寶）</h3><div class="f">
+          <label>每局下注秒數</label><input data-k="tbl.betSec" type="number">
+          <label>每人每局上限</label><input data-k="tbl.maxBet" type="number">
+          <label>籌碼面額（逗號）</label><input data-k="tbl.chips" data-type="nums">
+        </div>
+          <table style="margin-top:8px"><thead><tr><th>代號</th><th>種類</th><th>桌名</th><th></th></tr></thead><tbody id="tblT"></tbody></table>
+          <div class="btns"><button class="btn ghost sm" id="tAddR" style="width:auto">＋ 輪盤桌</button><button class="btn ghost sm" id="tAddS" style="width:auto">＋ 骰寶桌</button></div>
+          <div class="muted" style="margin-top:10px">輪盤賠率（拿回倍數，含本金）</div>
+          <div class="f">
+            <label>大小／單雙／紅黑</label><input data-k="tbl.roulette.even" type="number" step="0.1">
+            <label>列注</label><input data-k="tbl.roulette.col" type="number" step="0.1">
+            <label>直接注（單一號碼）</label><input data-k="tbl.roulette.num" type="number" step="1">
+          </div>
+          <div class="muted" style="margin-top:10px">骰寶賠率（拿回倍數，含本金）</div>
+          <div class="f">
+            <label>大／小</label><input data-k="tbl.sicbo.bs" type="number" step="0.1">
+            <label>任意豹子</label><input data-k="tbl.sicbo.anyT" type="number" step="1">
+            <label>指定豹子</label><input data-k="tbl.sicbo.tri" type="number" step="1">
+          </div>
+          <table style="margin-top:6px"><thead><tr><th>總和</th><th>拿回倍數</th><th>總和</th><th>拿回倍數</th></tr></thead><tbody id="sumT"></tbody></table>
+          <div class="rtp" id="tRtp"></div>
+        </div>
+        <div class="box"><h3>21 點（線上）</h3><div class="f">
+          <label>籌碼面額（逗號）</label><input data-k="bj.chips" data-type="nums">
+          <label>每局上限</label><input data-k="bj.maxBet" type="number">
+          <label>一般贏 拿回</label><input data-k="bj.pay.win" type="number" step="0.1">
+          <label>四張內 21 點 拿回</label><input data-k="bj.pay.t21" type="number" step="0.1">
+          <label>BlackJack 拿回</label><input data-k="bj.pay.bj" type="number" step="0.1">
+          <label>五龍 拿回</label><input data-k="bj.pay.five" type="number" step="0.1">
+        </div><div class="rtp">預設（2／2.5／2.5／3）模擬回收率約 <b>98～102%</b>。照立牌原始規則（2／3／3／4）約 105～110%，玩家會越玩越賺</div></div>
         <div class="box"><h3>蓋茨比尋寶</h3><div class="f">
           <label>每個線索獎勵</label><input data-k="hunt.reward" type="number">
           <label>全部找齊加碼</label><input data-k="hunt.allBonus" type="number">
@@ -261,10 +294,14 @@ td.n{text-align:right;font-family:Georgia,serif}
       <div class="grid">
         <div class="box"><h3>玩家入口（印在桌卡／迎賓立牌）</h3><div class="qrs"><div class="qcard" id="qApp"></div></div><div class="link" id="lApp"></div>
           <div class="btns"><button class="btn" data-print="qApp">列印</button></div></div>
-        <div class="box"><h3>荷官端（荷官手機開這個）</h3><div class="qrs"><div class="qcard" id="qDealer"></div></div><div class="link" id="lDealer"></div>
+        <div class="box"><h3>荷官開局（荷官手機開這個）</h3><div class="qrs"><div class="qcard" id="qDealer"></div></div><div class="link" id="lDealer"></div>
           <div class="muted" style="margin-top:6px">荷官密碼：<span class="gold" id="dPass"></span>（改密碼要改程式檔）</div></div>
         <div class="box"><h3>電視牆</h3><div class="link" id="lTv"></div><div class="muted" style="margin-top:6px">用電視牆主機的瀏覽器開，雙擊畫面全螢幕。</div>
           <div class="btns"><a class="btn ghost" id="aTv" target="_blank">開啟電視牆</a></div></div>
+      </div>
+      <div class="box" style="margin-top:14px"><h3>實體桌桌卡 QR（放在每張桌上，賓客掃了直接進這桌下注）</h3>
+        <div class="qrs" id="qTbl"></div>
+        <div class="btns"><button class="btn" data-print="qTbl">列印桌卡</button></div>
       </div>
       <div class="box" style="margin-top:14px"><h3>尋寶線索 QR（印出來藏在現場）</h3>
         <div class="qrs" id="qHunt"></div>
@@ -354,7 +391,17 @@ const GC_DEFAULTS = {
     pay5:    { "7":25, BAR:8, K:4, D:2, S:2, two7:1 },   /* 一條線上三個相同的倍數；two7＝一條線上有兩個 7 */
     weight5: { "7":2,  BAR:4, K:5, D:9, S:9 }            /* 每格出現權重 */
   },
-  chip:   { unit: 100, max: 1000 },             /* 實體桌換籌碼：單位與單次上限 */
+  /* 實體賭桌：荷官現場開局、玩家手機下注、荷官輸入結果後自動派彩（倍數＝拿回，含本金） */
+  tbl: {
+    betSec: 30, maxBet: 500, chips: [50, 100, 200, 500],
+    tables: [ { id: "R1", kind: "roulette", name: "輪盤 1 號桌" }, { id: "S1", kind: "sicbo", name: "骰寶 1 號桌" } ],
+    roulette: { even: 2, col: 3, num: 36 },     /* 大小／單雙／紅黑 1賠1、列注 1賠2、直接注 1賠35 */
+    sicbo: { bs: 2, anyT: 36, tri: 202,         /* 大小 1賠1、任意豹子 1賠35、指定豹子 1賠201 */
+      sum: { s4: 71, s5: 36, s6: 21, s7: 14, s8: 10, s9: 9, s10: 8, s11: 8, s12: 9, s13: 10, s14: 14, s15: 21, s16: 36, s17: 71 } }
+  },
+  /* 21 點（線上，跟電腦莊家）：倍數＝拿回（含本金） */
+  bj: { chips: [50, 100, 200, 500], maxBet: 500,
+        pay: { win: 2, t21: 2.5, bj: 2.5, five: 3 } },   /* 一般贏 1賠1、四張內 21 點 1賠1.5、BlackJack 1賠1.5、五龍 1賠2 */
   ticket: { per: 500, topN: 3 },                /* 每 500 幣換 1 張抽獎券；前 3 名不換券 */
   lockAt: "18:25",                              /* 自動鎖定時間 */
   autoLock: true,
@@ -786,6 +833,100 @@ const BAC = {
   NAME: { P: "閒", B: "莊", T: "和", PP: "閒對", BP: "莊對" }
 };
 
+/* ---------- 實體桌：輪盤（歐式，單一個 0） ---------- */
+const ROUL = {
+  RED: [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36],
+  color(n){ return n === 0 ? "g" : this.RED.includes(n) ? "r" : "b"; },
+  wins(n){
+    const w = ["n" + n];
+    if(n > 0) w.push(this.color(n) === "r" ? "red" : "black", n % 2 ? "odd" : "even", n <= 18 ? "low" : "high", "c" + ((n - 1) % 3 + 1));
+    return w;
+  },
+  mult(k, pay){ return k[0] === "n" ? +pay.num : k[0] === "c" ? +pay.col : +pay.even; },
+  NAME: { red: "紅", black: "黑", odd: "單", even: "雙", low: "小（1–18）", high: "大（19–36）", c1: "第一列", c2: "第二列", c3: "第三列" },
+  label(k){ return this.NAME[k] || (k[0] === "n" ? k.slice(1) + " 號" : k); },
+  resText(n){ return n + (n === 0 ? "" : this.color(n) === "r" ? " 紅" : " 黑"); },
+  rtp(pay){ return { even: 18 / 37 * pay.even, col: 12 / 37 * pay.col, num: pay.num / 37 }; }
+};
+/* ---------- 實體桌：骰寶 ---------- */
+const SICBO = {
+  wins(d){
+    const s = d[0] + d[1] + d[2], tri = d[0] === d[1] && d[1] === d[2], w = [];
+    if(!tri) w.push(s >= 11 ? "big" : "small");
+    if(s >= 4 && s <= 17) w.push("s" + s);
+    if(tri) w.push("anyT", "t" + d[0]);
+    return w;
+  },
+  mult(k, pay){ if(k === "big" || k === "small") return +pay.bs; if(k === "anyT") return +pay.anyT; if(k[0] === "t") return +pay.tri; return +(pay.sum || {})[k] || 0; },
+  label(k){ return k === "big" ? "大" : k === "small" ? "小" : k === "anyT" ? "任意豹子" : k[0] === "t" ? "豹子 " + k.slice(1) : k[0] === "s" ? "總和 " + k.slice(1) : k; },
+  resText(d){ const s = d[0] + d[1] + d[2], tri = d[0] === d[1] && d[1] === d[2]; return d.join("・") + "　" + s + " 點" + (tri ? " 豹子" : s >= 11 ? " 大" : " 小"); },
+  WAYS: (() => { const w = {}; for(let a = 1; a <= 6; a++) for(let b = 1; b <= 6; b++) for(let c = 1; c <= 6; c++){ const s = a + b + c; w[s] = (w[s] || 0) + 1; } return w; })(),
+  rtp(pay){ const o = { bs: 105 / 216 * pay.bs, anyT: 6 / 216 * pay.anyT, tri: pay.tri / 216, sum: {} }; for(let s = 4; s <= 17; s++) o.sum["s" + s] = this.WAYS[s] / 216 * ((pay.sum || {})["s" + s] || 0); return o; }
+};
+const TBL = {
+  R: { roulette: ROUL, sicbo: SICBO },
+  KIND: { roulette: "輪盤", sicbo: "骰寶" },
+  betKeys(b){ return Object.keys(b || {}).filter(k => k !== "nm" && +b[k] > 0); },
+  total(b){ return this.betKeys(b).reduce((a, k) => a + (+b[k] || 0), 0); },
+  payout(kind, b, result, pay){ const R = this.R[kind], w = R.wins(result); let got = 0; this.betKeys(b).forEach(k => { if(w.includes(k)) got += (+b[k] || 0) * R.mult(k, pay); }); return Math.round(got); },
+  resText(kind, result){ return this.R[kind].resText(result); },
+  label(kind, k){ return this.R[kind].label(k); },
+  tableOf(tid){ return (GC.cfg.tbl.tables || []).find(t => t.id === tid); },
+  /* 結算一局（荷官手機送出結果後執行；後台會接手卡住的局）——派彩用一次性旗標，重複執行也不會重複派 */
+  async settle(tid, snap){
+    const t = snap || (GC.state.tables || {})[tid];
+    if(!t || t.phase !== "settling") return;
+    const bets = (await DB.get("tblBets/" + t.id)) || {};
+    let winners = 0, paid = 0;
+    await pool(Object.keys(bets), 25, async pid => {
+      const amt = t.void ? this.total(bets[pid]) : this.payout(t.kind, bets[pid], t.result, t.pay);
+      if(amt <= 0) return;
+      const g = await GC.grant(pid, "tw/" + t.id, amt, t.name + "第" + t.no + "局 " + (t.void ? "作廢退回" : "開 " + this.resText(t.kind, t.result)));
+      if(g === "ok" || g === "dup"){ winners++; paid += amt; }
+    });
+    const res = await DB.tx("state/tables/" + tid, x => x === null ? null : (x.id === t.id && x.phase === "settling" ? Object.assign(x, { phase: "done", doneAt: DB.now(), bettors: Object.keys(bets).length, winners, paid }) : undefined));
+    if(res.committed && !t.void){
+      await DB.tx("state/tblRoad/" + tid, arr => (arr || []).concat([{ no: t.no, r: t.result }]).slice(-30));
+      const big = t.kind === "roulette" ? null : (t.result[0] === t.result[1] && t.result[1] === t.result[2]);
+      if(big) DB.push("feed", { t: "🎲 " + t.name + "開出豹子 " + t.result.join("・") + "！", ts: DB.now() });
+    }
+  }
+};
+
+/* ---------- 21 點（線上，跟電腦莊家） ---------- */
+const BJ = {
+  val(c){ const r = POKER.r(c) + 2; return r === 14 ? 1 : r > 10 ? 10 : r; },
+  total(cs){ let t = 0, a = false; cs.forEach(c => { const v = this.val(c); t += v; if(v === 1) a = true; }); const soft = a && t + 10 <= 21; return { t: soft ? t + 10 : t, soft }; },
+  isBJ(cs){ return cs.length === 2 && this.total(cs).t === 21; },
+  /* 發牌：閒明、莊暗、閒明、莊明 */
+  deal(id, stake){ const d = POKER.deck(); return { id, stake, deck: d.slice(4, 20), p: [d[0], d[2]], d: [d[1], d[3]], st: "play" }; },
+  /* 依目前狀態判斷是否結束；回傳更新後的 hand（st: play / done，res，mult） */
+  step(h, pay){
+    const pt = this.total(h.p).t, dbj = this.isBJ(h.d);
+    const end = (res, mult, dealerPlays) => {
+      if(dealerPlays) while(this.total(h.d).t < 17) h.d.push(h.deck.shift());
+      h.st = "done"; h.res = res; h.mult = mult; return h;
+    };
+    if(this.isBJ(h.p)) return dbj ? end("push", 1) : end("bj", pay.bj);
+    if(pt > 21) return end("bust", 0);
+    if(h.p.length >= 5) return end("five", pay.five);
+    if(pt === 21) return dbj ? end("dbj", 0) : end("t21", pay.t21);
+    if(h.stand){
+      if(dbj) return end("dbj", 0);
+      end("cmp", 0, true);
+      const dt = this.total(h.d).t;
+      if(dt > 21 || pt > dt){ h.res = "win"; h.mult = pay.win; }
+      else if(pt === dt){ h.res = "push"; h.mult = 1; }
+      else { h.res = "lose"; h.mult = 0; }
+      return h;
+    }
+    return h;
+  },
+  hit(h, pay){ h.p.push(h.deck.shift()); return this.step(h, pay); },
+  stand(h, pay){ h.stand = true; return this.step(h, pay); },
+  RES: { bj: "BLACKJACK！", t21: "21 點！", five: "五龍！", win: "你贏了！", push: "平手・退回押注", lose: "莊家贏", bust: "爆牌", dbj: "莊家 BLACKJACK" }
+};
+
 /* ---------- 賽馬：彩池賠率 ---------- */
 const HORSE = {
   STAR_W: { 1: 1, 2: 1.5, 3: 2.3, 4: 3.4, 5: 5 },
@@ -1133,6 +1274,25 @@ function renderBacA(){
   const road = GC.state.bacRoad || [];
   $("bRoadA").textContent = road.length ? "路單：" + road.slice(-20).map(x => BAC.NAME[x.r]).join(" ") : "";
 }
+/* ================= 實體桌（荷官手機開局；這裡只顯示狀態、接手卡住的派彩） ================= */
+let tblBusy = false;
+async function tblEngine(){
+  if(tblBusy) return; tblBusy = true;
+  const now = DB.now(), T = GC.state.tables || {};
+  try { for(const tid of Object.keys(T)){ const t = T[tid]; if(t && t.phase === "settling" && now - (t.settleAt || 0) > 8000) await TBL.settle(tid, t); } } catch(e){ console.error(e); }
+  tblBusy = false;
+  renderTblA();
+}
+function renderTblA(){
+  const T = GC.state.tables || {}, R = GC.state.tblRoad || {}, now = DB.now();
+  const ph = t => !t ? "尚未開局" : t.phase === "bet" ? (now < t.closeAt ? "下注中 " + fmtCd(t.closeAt - now) : "等荷官開獎") : t.phase === "settling" ? "派彩中…" : t.void ? "已作廢" : "結束・開 " + TBL.resText(t.kind, t.result) + "・中獎 " + (t.winners || 0) + " 人・派彩 " + money(t.paid || 0);
+  const html = (GC.cfg.tbl.tables || []).map(tb => { const t = T[tb.id], road = (R[tb.id] || []).slice(-6).reverse();
+    return '<tr><td>' + esc(tb.name) + '</td><td>' + (t ? t.no : "—") + '</td><td>' + esc(ph(t)) + '</td><td>' + road.map(x => esc(tb.kind === "roulette" ? String(x.r) : x.r.join(""))).join("・") + '</td><td>' + (t && t.phase === "bet" ? '<button class="btn inline ghost" data-tvoid="' + tb.id + '">作廢</button>' : "") + '</td></tr>'; }).join("");
+  if($("tblA").dataset.h !== html){ $("tblA").innerHTML = html; $("tblA").dataset.h = html;
+    $$("[data-tvoid]").forEach(b => b.onclick = async () => { const tid = b.dataset.tvoid, t = (GC.state.tables || {})[tid]; if(!t || !confirm("作廢 " + t.name + " 第 " + t.no + " 局並全額退回？")) return;
+      const r = await DB.tx("state/tables/" + tid, x => x === null ? null : (x.id === t.id && x.phase === "bet" ? Object.assign(x, { phase: "settling", void: true, settleAt: DB.now() }) : undefined));
+      if(r.committed){ await TBL.settle(tid, r.snapshot.val()); toast("已作廢並退回"); } }); }
+}
 const setBacAuto = async on => { const d = clone(GC.cfg); d.bac.auto = on; await DB.set("config", d); toast(on ? "百家樂開始自動開局" : "打完這局就暫停"); };
 $("bBacOn").onclick = () => setBacAuto(true);
 $("bBacOff").onclick = () => setBacAuto(false);
@@ -1223,9 +1383,21 @@ function fillCfg(){
   $("hTake").value = Math.round((+hc.take || 0) * 100);
   $("slotT").innerHTML = Object.keys(CFGDRAFT.slot.weight5).map(k => '<tr><td>' + SLOT_SYMS[k] + '　' + SLOT_NAMES[k] + '</td><td><input data-sp="' + k + '" type="number" value="' + CFGDRAFT.slot.pay5[k] + '" style="width:80px"></td><td><input data-sw="' + k + '" type="number" value="' + CFGDRAFT.slot.weight5[k] + '" style="width:80px"></td></tr>').join("");
   $("huntT").innerHTML = CFGDRAFT.hunt.clues.map((c, i) => '<tr><td>' + (i+1) + '</td><td><input data-cn="' + i + '" value="' + esc(c.name) + '" style="width:100%"></td><td><input data-ch="' + i + '" value="' + esc(c.hint) + '" style="width:100%"></td></tr>').join("");
+  renderTblCfg();
   $$("#tCfg input, #tCfg select").forEach(e => e.oninput = readCfg);
   readCfg();
 }
+function renderTblCfg(){
+  const d = CFGDRAFT;
+  $("tblT").innerHTML = d.tbl.tables.map((t, i) => '<tr><td>' + esc(t.id) + '</td><td>' + TBL.KIND[t.kind] + '</td><td><input data-tn="' + i + '" value="' + esc(t.name) + '" style="width:100%"></td><td><button class="btn inline ghost" data-tdel="' + i + '">刪除</button></td></tr>').join("");
+  const S = []; for(let s = 4; s <= 10; s++) S.push(s);
+  $("sumT").innerHTML = S.map(s => '<tr><td>' + s + '</td><td><input data-ss="s' + s + '" type="number" value="' + d.tbl.sicbo.sum["s" + s] + '" style="width:70px"></td><td>' + (s + 7) + '</td><td><input data-ss="s' + (s + 7) + '" type="number" value="' + d.tbl.sicbo.sum["s" + (s + 7)] + '" style="width:70px"></td></tr>').join("");
+  $$("[data-tdel]").forEach(b => b.onclick = () => { readCfg(); d.tbl.tables.splice(+b.dataset.tdel, 1); renderTblCfg(); readCfg(); });
+  $$("#tblT input, #sumT input").forEach(e => e.oninput = readCfg);
+}
+const addTable = kind => { readCfg(); const d = CFGDRAFT, pre = kind === "roulette" ? "R" : "S"; let n = 1; while(d.tbl.tables.some(t => t.id === pre + n)) n++; d.tbl.tables.push({ id: pre + n, kind, name: TBL.KIND[kind] + " " + n + " 號桌" }); renderTblCfg(); readCfg(); };
+$("tAddR").onclick = () => addTable("roulette");
+$("tAddS").onclick = () => addTable("sicbo");
 function readCfg(){
   const d = CFGDRAFT;
   $$("#tCfg [data-k]").forEach(e => {
@@ -1244,6 +1416,10 @@ function readCfg(){
   d.horse.take = Math.max(0, Math.min(50, +$("hTake").value || 0)) / 100;
   $$("[data-sp]").forEach(e => d.slot.pay5[e.dataset.sp] = +e.value);
   $$("[data-sw]").forEach(e => d.slot.weight5[e.dataset.sw] = +e.value);
+  $$("[data-tn]").forEach(e => d.tbl.tables[+e.dataset.tn].name = e.value.trim());
+  $$("[data-ss]").forEach(e => d.tbl.sicbo.sum[e.dataset.ss] = +e.value);
+  const rr = ROUL.rtp(d.tbl.roulette), sr2 = SICBO.rtp(d.tbl.sicbo), pc = x => (x * 100).toFixed(1) + "%";
+  $("tRtp").innerHTML = "輪盤回收率：大小單雙紅黑 <b>" + pc(rr.even) + "</b>・列注 <b>" + pc(rr.col) + "</b>・直接注 <b>" + pc(rr.num) + "</b><br>骰寶回收率：大小 <b>" + pc(sr2.bs) + "</b>・任意豹子 <b>" + pc(sr2.anyT) + "</b>・指定豹子 <b>" + pc(sr2.tri) + "</b>・總和 " + Object.keys(sr2.sum).map(k => k.slice(1) + " <b>" + pc(sr2.sum[k]) + "</b>").join("、") + "（超過 100% 代表玩家有利）";
   $$("[data-cn]").forEach(e => d.hunt.clues[+e.dataset.cn].name = e.value.trim());
   $$("[data-ch]").forEach(e => d.hunt.clues[+e.dataset.ch].hint = e.value.trim());
   const sr = GC.slotRtp(d.slot);
@@ -1256,7 +1432,8 @@ $("cSave").onclick = async () => {
   readCfg();
   const d = CFGDRAFT;
   if(d.horse.names.some(n => !n)) return $("cMsg").textContent = "馬名不能空白";
-  if(!d.pk.stakes.length || !d.horse.chips.length) return $("cMsg").textContent = "押注選項不能空白";
+  if(!d.pk.stakes.length || !d.horse.chips.length || !d.tbl.chips.length || !d.bj.chips.length) return $("cMsg").textContent = "押注選項不能空白";
+  if(d.tbl.tables.some(t => !t.name)) return $("cMsg").textContent = "桌名不能空白";
   if(d.horse.times.some(t => !/^\d{1,2}:\d{2}$/.test(t))) return $("cMsg").textContent = "開盤時段格式要像 17:50";
   await DB.set("config", d);
   $("cMsg").textContent = "已儲存 " + new Date().toLocaleTimeString("zh-TW", { hour12: false }) + "，所有手機已套用";
@@ -1268,7 +1445,8 @@ function qcard(title, sub, url){ return '<svg></svg>'.replace('<svg></svg>', qrS
 function renderQr(){
   const app = pageUrl(GC_FILES.app), dealer = pageUrl(GC_FILES.dealer), tv = pageUrl(GC_FILES.tv);
   $("qApp").innerHTML = qcard("大亨錢包", "掃碼開通・領 " + money(GC.cfg.bonus) + " 大亨幣", app); $("lApp").textContent = app;
-  $("qDealer").innerHTML = qcard("荷官端", "工作人員專用", dealer); $("lDealer").textContent = dealer;
+  $("qDealer").innerHTML = qcard("荷官開局", "工作人員專用", dealer);
+  $("qTbl").innerHTML = (GC.cfg.tbl.tables || []).map(t => '<div class="qcard">' + qcard(esc(t.name), "掃碼下注・荷官開獎後自動派彩", pageUrl(GC_FILES.app, { tbl: t.id })) + '</div>').join(""); $("lDealer").textContent = dealer;
   $("lTv").textContent = tv; $("aTv").href = tv; $("dPass").textContent = GC_PASS.dealer;
   $("qHunt").innerHTML = GC.cfg.hunt.clues.map((c, i) => '<div class="qcard">' + qcard("蓋茨比尋寶・線索 " + (i+1), "掃描獲得 " + GC.cfg.hunt.reward + " 大亨幣", pageUrl(GC_FILES.app, { clue: c.token })) + '<div class="qs" style="margin-top:4px">（藏點：' + esc(c.name) + '）</div></div>').join("");
 }
@@ -1293,7 +1471,7 @@ $("bCsv").onclick = () => {
 $("bWipe").onclick = async () => {
   if($("wTxt").value.trim() !== "清空") return toast("請先輸入「清空」");
   if(!confirm("最後確認：刪除所有玩家與紀錄？")) return;
-  const u = {}; ["players","codes","logs","bets","pools","bacBets","pk","pkPairs","pkq","pkm","inbox","board","state","feed","raceLog","dealerLog"].forEach(k => u[k] = null);
+  const u = {}; ["players","codes","logs","bets","pools","bacBets","pk","pkPairs","pkq","pkm","inbox","board","state","feed","raceLog","dealerLog","tblBets","bj"].forEach(k => u[k] = null);
   await DB.update("", u); $("wTxt").value = ""; lastBoard = ""; toast("已清空");
 };
 
@@ -1309,6 +1487,7 @@ async function start(){
   DB.on("raceLog", v => { RLOG = v || {}; renderRlog(); });
   setInterval(engine, 1000);
   setInterval(bacEngine, 500);
+  setInterval(tblEngine, 1000);
   setInterval(computeBoard, 3500);
 }
 (() => { let ok = false; try { ok = sessionStorage.getItem("gc_admin") === "1"; } catch(e){} if(ok) start(); })();
