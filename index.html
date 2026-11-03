@@ -2565,8 +2565,8 @@ function xBoardHtml(kind, pay){
     for(let n = 1; n <= 36; n++) h += cell("n" + n, ROUL.color(n), '<span class="xn">' + n + '</span>');
     h += cell("c1", "out", '<span class="xn">2 to 1</span><span class="xo">第一列 ' + od(pay.col) + '</span>') + cell("c2", "out", '<span class="xn">2 to 1</span><span class="xo">第二列 ' + od(pay.col) + '</span>') + cell("c3", "out", '<span class="xn">2 to 1</span><span class="xo">第三列 ' + od(pay.col) + '</span>') + '</div>';
     h += '<div class="xsec">一 賠 一</div><div class="xg" style="grid-template-columns:repeat(3,1fr)">' +
-      cell("low", "out", '<span class="xn">小</span><span class="xo">1–18</span>') + cell("even", "out", '<span class="xn">雙</span>') + cell("red", "r", '<span class="xn">紅</span>') +
-      cell("black", "b", '<span class="xn">黑</span>') + cell("odd", "out", '<span class="xn">單</span>') + cell("high", "out", '<span class="xn">大</span><span class="xo">19–36</span>') + '</div>';
+      cell("red", "r", '<span class="xn">紅</span>') + cell("odd", "out", '<span class="xn">單</span>') + cell("low", "out", '<span class="xn">小</span><span class="xo">1–18</span>') +
+      cell("black", "b", '<span class="xn">黑</span>') + cell("even", "out", '<span class="xn">雙</span>') + cell("high", "out", '<span class="xn">大</span><span class="xo">19–36</span>') + '</div>';
     h += '<div class="xsec" style="text-align:center">單一號碼 ' + od(pay.num) + '　｜　開出 0 時，只有押 0 的人贏</div>';
     return h;
   }
