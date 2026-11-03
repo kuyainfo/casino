@@ -120,7 +120,7 @@ html,body{height:100%;overflow:hidden;background:#020a06}
 .stats .v{font-family:Georgia,serif;font-size:56px;color:var(--gold2);font-weight:700}
 .otb{width:100%;margin-top:12px;border-collapse:collapse;font-size:28px}
 .otb th{color:var(--muted);font-weight:400;font-size:22px;text-align:left;padding:4px 8px;letter-spacing:.2em}
-.otb td{padding:5px 8px;border-bottom:1px solid rgba(216,178,92,.18)}
+.otb td{padding:3px 8px;border-bottom:1px solid rgba(216,178,92,.18)}
 .otb .ox{font-family:Georgia,serif;color:var(--gold2);font-weight:700}.otb .ox2{font-family:Georgia,serif;color:var(--ink)}
 .pulse{animation:pulse 1.2s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.45}}
@@ -216,8 +216,9 @@ const GC_DEFAULTS = {
   slot: {
     cost: 50,                                   /* 賠率基準；實際每轉押注見 bets */
     bets: [50, 100, 200],
-    pay:    { "7":50, BAR:20, K:10, D:5, S:5, two7:2 },
-    weight: { "7":5,  BAR:3,  K:4,  D:6, S:6 }  /* 每格出現權重，回收率約 90% */
+    /* 5 條線全開（上、中、下排＋兩條斜線），每條線獨立計算、加總；每轉價錢不變。5 線合計回收率約 91% */
+    pay5:    { "7":25, BAR:8, K:4, D:2, S:2, two7:1 },   /* 一條線上三個相同的倍數；two7＝一條線上有兩個 7 */
+    weight5: { "7":2,  BAR:4, K:5, D:9, S:9 }            /* 每格出現權重 */
   },
   chip:   { unit: 100, max: 1000 },             /* 實體桌換籌碼：單位與單次上限 */
   ticket: { per: 500, topN: 3 },                /* 每 500 幣換 1 張抽獎券；前 3 名不換券 */
@@ -231,6 +232,8 @@ const HORSE_COLORS = ["#F2D27A","#E8968A","#9CC9B0","#B9A6E8","#F5ECD2","#9CC0E8
 const SILKS = [ ["#1d7a4a","#f2d27a"], ["#c0262d","#ffffff"], ["#1f3f8a","#f2d27a"], ["#6a3b9c","#ffffff"], ["#f5ecd2","#c0262d"], ["#111111","#9cc0e8"] ];  /* 騎師彩衣 [主色, 配色] */
 const SLOT_SYMS = { "7":"7", BAR:"BAR", K:"♛", D:"♦", S:"♠" };
 const SLOT_NAMES = { "7":"7", BAR:"BAR", K:"皇冠", D:"鑽石", S:"黑桃" };
+const SLOT_LINES = [[0,0,0],[1,1,1],[2,2,2],[0,1,2],[2,1,0]];   /* 每條線在三個轉輪上取第幾格（0 上、1 中、2 下） */
+const SLOT_LINE_NAMES = ["上排","中排","下排","斜線 ↘","斜線 ↗"];
 
 /* ---------- 小工具 ---------- */
 const $  = id => document.getElementById(id);
@@ -489,24 +492,28 @@ const GC = {
     return m ? m[1] : null;
   },
   /* 賽馬：依賠率換算中獎機率 */
+  /* 每條線的期望值 × 5 條線（每格獨立抽，所以可以直接相乘） */
   slotRtp(slot){
-    const S = Object.keys(slot.weight), w = slot.weight, T = S.reduce((a,k)=>a + (+w[k]||0), 0); let r = 0;
-    for(const a of S) for(const b of S) for(const c of S){
-      const pr = (w[a]*w[b]*w[c]) / (T*T*T);
-      r += pr * this.slotMult([a,b,c], slot);
-    }
-    return r;
+    const w = slot.weight5, S = Object.keys(w), T = S.reduce((a,k)=>a + (+w[k]||0), 0); let r = 0;
+    for(const a of S) for(const b of S) for(const c of S) r += (w[a]*w[b]*w[c]) / (T*T*T) * this.slotMult([a,b,c], slot);
+    return r * SLOT_LINES.length;
   },
-  slotMult(reels, slot){
-    const [a,b,c] = reels;
-    if(a === b && b === c) return +slot.pay[a] || 0;
-    if(reels.filter(x => x === "7").length === 2) return +slot.pay.two7 || 0;
+  slotMult(three, slot){
+    const [a,b,c] = three, p = slot.pay5;
+    if(a === b && b === c) return +p[a] || 0;
+    if(three.filter(x => x === "7").length === 2) return +p.two7 || 0;
     return 0;
   },
-  slotSpin(slot){
-    const S = Object.keys(slot.weight), w = slot.weight, T = S.reduce((a,k)=>a + (+w[k]||0), 0);
-    const one = () => { let x = rnd() * T; for(const k of S){ x -= +w[k]||0; if(x < 0) return k; } return S[S.length-1]; };
-    return [one(), one(), one()];
+  slotSym(slot){
+    const w = slot.weight5, S = Object.keys(w), T = S.reduce((a,k)=>a + (+w[k]||0), 0);
+    let x = rnd() * T; for(const k of S){ x -= +w[k]||0; if(x < 0) return k; } return S[S.length-1];
+  },
+  /* 回傳 3 個轉輪 × [上, 中, 下] */
+  slotSpin(slot){ return [0,1,2].map(() => [this.slotSym(slot), this.slotSym(slot), this.slotSym(slot)]); },
+  slotEval(grid, slot){
+    const wins = []; let total = 0;
+    SLOT_LINES.forEach((ln, li) => { const three = ln.map((row, reel) => grid[reel][row]), m = this.slotMult(three, slot); if(m){ wins.push({ li, three, m }); total += m; } });
+    return { wins, total };
   },
   ticketsOf(bal, rank){ const t = this.cfg.ticket; if(rank && rank <= t.topN) return 0; return Math.floor((bal||0) / t.per); }
 };
@@ -648,11 +655,37 @@ const BAC = {
 /* ---------- 賽馬：彩池賠率 ---------- */
 const HORSE = {
   STAR_W: { 1: 1, 2: 1.5, 3: 2.3, 4: 3.4, 5: 5 },
+  STYLE_NAME: { even: "平均型", front: "前段型", closer: "後段型", chaos: "多變型" },
+  WEATHER: [
+    { id: "fine",  name: "晴・良場", p: 0.5,  mod: {},                         note: "沒有特別影響" },
+    { id: "soft",  name: "陰・稍重", p: 0.25, mod: { closer: 1.15, front: 0.9 }, note: "後段型 +15%、前段型 −10%" },
+    { id: "heavy", name: "雨・重場", p: 0.25, mod: { closer: 1.3, front: 0.8 },  note: "後段型 +30%、前段型 −20%" }
+  ],
+  NEWS: [
+    { t: "換上王牌騎師", m: 1.25 }, { t: "晨操表現亮眼", m: 1.15 }, { t: "今天特別有精神", m: 1.15 },
+    { t: "昨晚沒睡好", m: 0.8 }, { t: "蹄鐵剛換，還不習慣", m: 0.85 }, { t: "最近有點挑食", m: 0.9 },
+    { t: "馴馬師神秘一笑：「今天有驚喜」", mystery: true }
+  ],
+  styleOf(h){ return RACE.STYLE[h % RACE.STYLE.length]; },
+  /* 開盤時產生天氣、快報；vis＝公開的倍率（用來算開盤賠率），tru＝實際倍率（含神秘效果，用來抽名次） */
+  setup(n, R){
+    R = R || rnd;
+    let x = R(), wi = 0; for(; wi < this.WEATHER.length - 1; wi++){ x -= this.WEATHER[wi].p; if(x < 0) break; }
+    const W = this.WEATHER[wi], vis = [], tru = [];
+    for(let h = 0; h < n; h++) vis[h] = W.mod[this.styleOf(h)] || 1;
+    const k = R() < 0.5 ? 1 : 2, hs = Array.from({ length: n }, (_, i) => i).sort(() => R() - 0.5).slice(0, k);
+    const ni = Array.from({ length: this.NEWS.length }, (_, i) => i).sort(() => R() - 0.5);
+    const news = hs.map((h, j) => ({ h, i: ni[j] }));
+    let myst = null;
+    news.forEach(nw => { const N = this.NEWS[nw.i]; if(N.mystery) myst = { h: nw.h, up: R() < 0.5 }; else vis[nw.h] *= N.m; });
+    for(let h = 0; h < n; h++) tru[h] = vis[h] * (myst && myst.h === h ? (myst.up ? 1.3 : 0.7) : 1);
+    return { weather: W.id, news, myst, vis, tru };
+  },
   ck(i, j){ return i < j ? i + "_" + j : j + "_" + i; },
   combos(n){ const o = []; for(let i = 0; i < n; i++) for(let j = i + 1; j < n; j++) o.push([i, j]); return o; },
   /* 依今日狀態算出：獨贏機率 pw、前三名機率 pp、前兩名組合機率 pq */
-  probs(stars){
-    const w = stars.map(s => this.STAR_W[s] || 1), T = w.reduce((a, b) => a + b, 0), pw = w.map(x => x / T);
+  probs(stars, mult){
+    const w = stars.map((s, i) => (this.STAR_W[s] || 1) * (mult ? mult[i] : 1)), T = w.reduce((a, b) => a + b, 0), pw = w.map(x => x / T);
     const n = stars.length, pp = new Array(n).fill(0), pq = {}, N = 12000;
     this.combos(n).forEach(([i, j]) => pq[this.ck(i, j)] = 0);
     for(let k = 0; k < N; k++){ const o = this.order(pw); for(let t = 0; t < 3; t++) pp[o[t]] += 1 / N; pq[this.ck(o[0], o[1])] += 1 / N; }
@@ -719,27 +752,51 @@ const RACE = {
     const T1 = run * 0.86, fin = new Array(n), photo = R() < 0.35;
     let t = T1;
     race.order.forEach((h, k) => { if(k === 0) fin[h] = T1; else { t += k === 1 ? (photo ? 0.03 + R() * 0.05 : 0.25 + R() * 0.6) : 0.12 + R() * 0.6; fin[h] = t; } });
+    /* 賽中突發事件：配合預先決定的名次演出（只改過程，不改結果） */
+    const ER = this.prng((race.seed || 1) ^ 0x5bd1e995), pick = arr => arr[Math.floor(ER() * arr.length)];
+    const all = race.order.slice(), others = all.slice(1);
+    let events = [];
+    if(ER() < 0.40){ const h = pick(all); events.push({ type: "slow", h, d: 0.7 + ER() * 0.5 }); }
+    if(ER() < 0.35){ const h = ER() < 0.3 ? all[0] : pick(others); events.push({ type: "stumble", h, u: 0.35 + ER() * 0.3 }); }
+    if(ER() < 0.25){ const h = pick(all); let h2 = pick(all); if(h2 === h) h2 = all[(all.indexOf(h) + 1) % n]; events.push({ type: "bump", h, h2, u: 0.34 + ER() * 0.24 }); }
+    if(ER() < 0.30){ const h = pick(all.slice(0, 3)); events.push({ type: "surge", h, u: 0.83 + ER() * 0.06 }); }
+    if(!events.length){ const h = pick(all); events.push(ER() < 0.5 ? { type: "slow", h, d: 0.8 } : { type: "stumble", h: pick(others), u: 0.5 }); }
+    events = events.slice(0, 3);
+    const fx = Array.from({ length: n }, () => []);
+    events.forEach(e => { fx[e.h].push(e); if(e.h2 != null) fx[e.h2].push(e); });
     const bump = (u, c, w) => Math.exp(-Math.pow((u - c) / w, 2));
     const cum = [], burst = [];
     for(let h = 0; h < n; h++){
       const st = this.STYLE[h % this.STYLE.length], f1 = 0.8 + R() * 1.2, f2 = 2.2 + R() * 2, a = R() * 6.28, b = R() * 6.28;
-      const wig = st === "chaos" ? 0.22 : 0.1, bc = 0.68 + R() * 0.14;
+      const wig = st === "chaos" ? 0.22 : 0.1, bc = 0.68 + R() * 0.14, T = fin[h];
       const c = [0]; let acc = 0;
       for(let k = 1; k <= N; k++){
         const u = (k - 0.5) / N;
         let s = 1 + wig * Math.sin(6.283 * f1 * u + a) + 0.05 * Math.sin(6.283 * f2 * u + b);
         if(st === "front") s += 0.32 * Math.pow(1 - u, 1.6) - 0.08;
         if(st === "closer") s += 0.55 * bump(u, bc, 0.09) - 0.06;
-        s *= Math.min(1, 0.3 + u * 7);
-        acc += Math.max(0.2, s); c.push(acc);
+        s = Math.max(0.2, s * Math.min(1, 0.3 + u * 7));
+        fx[h].forEach(e => {
+          if(e.type === "slow" && u * T < e.d) s *= 0.12;
+          if(e.type === "stumble") s *= 1 - 0.7 * bump(u * T, e.u * T, 0.45);
+          if(e.type === "bump") s *= 1 - 0.45 * bump(u * T, e.u * T, 0.4);
+          if(e.type === "surge") s *= 1 + 0.7 * bump(u, e.u, 0.05);
+        });
+        acc += Math.max(0.02, s); c.push(acc);
       }
       cum.push(c.map(x => x / acc));
       burst.push(st === "closer" ? bc : null);
     }
+    /* 事件發生的比賽時間（秒），給字幕和動畫用 */
+    events.forEach(e => { e.t = e.type === "slow" ? 0.2 : e.u * fin[e.h]; });
     const last = Math.max(...fin);
-    const p = { fin, cum, N, photo, burst, slowA: T1 - 0.45, slowB: T1 + 0.2 };
-    p.total = this.toReal(p, last) + 1.2 + (photo ? 1.8 : 0);
+    const p = { fin, cum, N, photo, burst, events, slowA: T1 - 0.45, slowB: T1 + 0.2 };
+    p.total = this.toReal(p, last) + 1.2 + (p.photo ? 1.8 : 0);
     return p;
+  },
+  EVENT_TXT(e, names){
+    const nm = h => (h + 1) + " 號 " + names[h];
+    return e.type === "slow" ? nm(e.h) + " 出閘慢了！" : e.type === "stumble" ? nm(e.h) + " 失蹄踉蹌！" : e.type === "bump" ? (e.h + 1) + " 號、" + (e.h2 + 1) + " 號 擦撞卡位！" : nm(e.h) + " 最後暴衝！";
   },
   /* 實際經過秒數 → 比賽時間（照片判定時放慢） */
   toRace(p, e){ if(!p.photo || e <= p.slowA) return e; const span = p.slowB - p.slowA; if(e <= p.slowA + span * this.SLOW) return p.slowA + (e - p.slowA) / this.SLOW; return e - span * (this.SLOW - 1); },
@@ -829,6 +886,15 @@ function watchBets(r){
   if(betsUnsub) betsUnsub(); betsUnsub = null; BETS = {}; betsFor = id;
   if(id) betsUnsub = DB.on("pools/" + id, v => { BETS = v || {}; lastKey = ""; });
 }
+function tvInfo(r){
+  const W = HORSE.WEATHER.find(w => w.id === r.weather);
+  return W ? '<div style="font-size:22px;margin-top:6px;color:var(--ink)">天氣：' + W.name + '（' + W.note + '）</div>' : '';
+}
+function tvNews(r, i){
+  const nw = (r.news || []).find(x => x.h === i); if(!nw) return "";
+  const N = HORSE.NEWS[nw.i];
+  return '<span style="font-size:19px;margin-left:12px;color:' + (N.mystery ? "#f3dc9c" : N.m > 1 ? "#9fe8a8" : "#f0a49a") + '">' + (N.mystery ? "？" : N.m > 1 ? "▲" : "▼") + ' ' + esc(N.t) + '</span>';
+}
 function nextSchedule(){ const now = DB.now(); return (GC.cfg.horse.times || []).map(t => todayAt(t, now)).filter(t => t > now).sort((a,b) => a - b)[0] || null; }
 
 function renderMain(){
@@ -841,15 +907,15 @@ function renderMain(){
   else if(r && ["open","running","settling"].includes(r.phase)) view = "run";
   else if(r && r.phase === "done" && now - (r.doneAt || 0) < 4 * 60000) view = "done";
   const names = (r && r.names) || c.names;
-  const key = view + "|" + (r ? r.id + r.phase : "") + "|" + JSON.stringify(BETS).length;
+  const key = view + "|" + (r ? r.id + r.phase + (r.eventsTxt ? 1 : 0) : "") + "|" + JSON.stringify(BETS).length;
   if(key !== lastKey){
     lastKey = key; const m = $("main");
     if(view === "open"){
       const P = BETS || {}, st = n => '<span style="color:#f2c94c;font-size:24px">' + "★".repeat(n) + '<span style="color:rgba(255,255,255,.18)">' + "★".repeat(5 - n) + '</span></span>';
-      m.innerHTML = '<div class="panel"><div class="row" style="align-items:flex-start"><div><div class="h1">午夜賽馬・第 ' + r.no + ' 場</div><div class="lbl" style="margin-top:8px">開 盤 中 ・ 拿 起 手 機 下 注</div></div>' +
+      m.innerHTML = '<div class="panel"><div class="row" style="align-items:flex-start"><div><div class="h1">午夜賽馬・第 ' + r.no + ' 場</div><div class="lbl" style="margin-top:8px">開 盤 中 ・ 拿 起 手 機 下 注</div>' + tvInfo(r) + '</div>' +
         '<div style="text-align:right"><div class="lbl">截止倒數</div><div class="big" id="cd" style="font-size:110px">--</div></div></div>' +
-        '<table class="otb"><tr><th></th><th>今日狀態</th><th>獨贏</th><th>位置</th></tr>' + names.map((n, i) => '<tr><td>' + ball(i) + '　' + esc(n) + '</td><td>' + st(r.stars[i]) + '</td><td class="ox">× ' + HORSE.odds(r, P, "w", "h" + i) + '</td><td class="ox2">× ' + HORSE.odds(r, P, "p", "h" + i) + '</td></tr>').join("") + '</table>' +
-        '<div class="lbl" style="margin-top:14px;text-align:center;font-size:22px;letter-spacing:.08em">' + (P.n || 0) + ' 人下注　・　獨贏彩池 ' + money((P.w || {}).tot || 0) + '　・　位置彩池 ' + money((P.p || {}).tot || 0) + '　・　連贏彩池 ' + money((P.q || {}).tot || 0) + '</div></div>';
+        '<table class="otb"><tr><th></th><th>今日狀態</th><th>獨贏</th><th>位置</th></tr>' + names.map((n, i) => '<tr><td>' + ball(i) + '　' + esc(n) + tvNews(r, i) + '</td><td>' + st(r.stars[i]) + '</td><td class="ox">× ' + HORSE.odds(r, P, "w", "h" + i) + '</td><td class="ox2">× ' + HORSE.odds(r, P, "p", "h" + i) + '</td></tr>').join("") + '</table>' +
+        '<div class="lbl" style="margin-top:8px;text-align:center;font-size:22px;letter-spacing:.08em">' + (P.n || 0) + ' 人下注　・　獨贏彩池 ' + money((P.w || {}).tot || 0) + '　・　位置彩池 ' + money((P.p || {}).tot || 0) + '　・　連贏彩池 ' + money((P.q || {}).tot || 0) + '</div></div>';
     } else if(view === "run"){
       m.innerHTML = '<div class="panel" style="text-align:center;padding:70px 40px"><div class="h1">第 ' + r.no + ' 場 ・ 比 賽 進 行 中</div>' +
         '<div class="lbl pulse" style="margin-top:24px;font-size:40px">請 看 你 的 手 機</div>' +
@@ -862,6 +928,7 @@ function renderMain(){
         '<div class="pod">' + [1, 0, 2].map(k => o[k] != null ? '<div class="p p' + (k+1) + '">' + ball(o[k]) + '<div class="pn">' + esc(names[o[k]]) + '</div><div class="pl">' + ["冠 軍","亞 軍","季 軍"][k] + "" + '</div><div class="st"></div></div>' : "").join("") + '</div>' +
         '<div class="lbl" style="margin-top:16px;font-size:24px;color:var(--ink);letter-spacing:.06em">獨贏 ' + (o[0]+1) + ' 號 <span class="gold">' + fo("w", "h" + o[0]) + '</span>　　連贏 ' + (o[0]+1) + '・' + (o[1]+1) + ' 號 <span class="gold">' + fo("q", qk) + '</span></div>' +
         '<div class="lbl" style="margin-top:6px;font-size:24px;color:var(--ink);letter-spacing:.06em">位置　' + o.slice(0, 3).map(h => (h+1) + ' 號 <span class="gold">' + fo("p", "h" + h) + '</span>').join("　") + '</div>' +
+        (r.eventsTxt && r.eventsTxt.length ? '<div style="font-size:22px;margin-top:8px;color:var(--muted)">' + r.eventsTxt.map(esc).join("　") + '</div>' : '') +
         '<div class="lbl" style="margin-top:12px;font-size:30px;color:var(--ink)">中獎 <span class="gold">' + (r.winners || 0) + '</span> 人　・　派彩 <span class="gold">' + money(r.paid || 0) + '</span> 大亨幣</div>') + '</div>';
     } else {
       const nx = nextSchedule();

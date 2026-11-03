@@ -103,6 +103,12 @@ button,input,select{font-family:inherit;font-size:16px}
 .hinfo{flex:1;min-width:0}
 .hname{font-weight:700;font-size:16px;letter-spacing:.05em}
 .hjk{font-size:12px;color:var(--muted)}
+.stag{display:inline-block;font-size:10px;font-weight:400;letter-spacing:0;padding:0 5px;margin-left:6px;border-radius:8px;vertical-align:2px;border:1px solid}
+.st-front{color:#f0a49a;border-color:#c0504a}.st-closer{color:#9cc0e8;border-color:#4f7fc0}.st-even{color:#c9d2c4;border-color:#7a8a74}.st-chaos{color:#d4b8f0;border-color:#8a6ab8}
+.hnews{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hnews.nup{color:#9fe8a8}.hnews.ndn{color:#f0a49a}.hnews.nq{color:#f3dc9c}
+.wbox{display:flex;align-items:center;gap:12px;padding:10px 14px}.wbox .wic{font-size:28px;color:var(--gold2)}
+.evbox div{font-size:13px;padding:2px 0}.evbox .mreveal{margin-top:4px;padding-top:6px;border-top:1px dashed rgba(216,178,92,.3)}
 .hblurb{font-size:12px;color:#d9cfb4;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hodds{text-align:right;flex:none;min-width:64px}
 .hodds .ho{font:700 clamp(17px,5.4vw,21px) Georgia;color:var(--gold2)}
@@ -1054,11 +1060,37 @@ const BAC = {
 /* ---------- 賽馬：彩池賠率 ---------- */
 const HORSE = {
   STAR_W: { 1: 1, 2: 1.5, 3: 2.3, 4: 3.4, 5: 5 },
+  STYLE_NAME: { even: "平均型", front: "前段型", closer: "後段型", chaos: "多變型" },
+  WEATHER: [
+    { id: "fine",  name: "晴・良場", p: 0.5,  mod: {},                         note: "沒有特別影響" },
+    { id: "soft",  name: "陰・稍重", p: 0.25, mod: { closer: 1.15, front: 0.9 }, note: "後段型 +15%、前段型 −10%" },
+    { id: "heavy", name: "雨・重場", p: 0.25, mod: { closer: 1.3, front: 0.8 },  note: "後段型 +30%、前段型 −20%" }
+  ],
+  NEWS: [
+    { t: "換上王牌騎師", m: 1.25 }, { t: "晨操表現亮眼", m: 1.15 }, { t: "今天特別有精神", m: 1.15 },
+    { t: "昨晚沒睡好", m: 0.8 }, { t: "蹄鐵剛換，還不習慣", m: 0.85 }, { t: "最近有點挑食", m: 0.9 },
+    { t: "馴馬師神秘一笑：「今天有驚喜」", mystery: true }
+  ],
+  styleOf(h){ return RACE.STYLE[h % RACE.STYLE.length]; },
+  /* 開盤時產生天氣、快報；vis＝公開的倍率（用來算開盤賠率），tru＝實際倍率（含神秘效果，用來抽名次） */
+  setup(n, R){
+    R = R || rnd;
+    let x = R(), wi = 0; for(; wi < this.WEATHER.length - 1; wi++){ x -= this.WEATHER[wi].p; if(x < 0) break; }
+    const W = this.WEATHER[wi], vis = [], tru = [];
+    for(let h = 0; h < n; h++) vis[h] = W.mod[this.styleOf(h)] || 1;
+    const k = R() < 0.5 ? 1 : 2, hs = Array.from({ length: n }, (_, i) => i).sort(() => R() - 0.5).slice(0, k);
+    const ni = Array.from({ length: this.NEWS.length }, (_, i) => i).sort(() => R() - 0.5);
+    const news = hs.map((h, j) => ({ h, i: ni[j] }));
+    let myst = null;
+    news.forEach(nw => { const N = this.NEWS[nw.i]; if(N.mystery) myst = { h: nw.h, up: R() < 0.5 }; else vis[nw.h] *= N.m; });
+    for(let h = 0; h < n; h++) tru[h] = vis[h] * (myst && myst.h === h ? (myst.up ? 1.3 : 0.7) : 1);
+    return { weather: W.id, news, myst, vis, tru };
+  },
   ck(i, j){ return i < j ? i + "_" + j : j + "_" + i; },
   combos(n){ const o = []; for(let i = 0; i < n; i++) for(let j = i + 1; j < n; j++) o.push([i, j]); return o; },
   /* 依今日狀態算出：獨贏機率 pw、前三名機率 pp、前兩名組合機率 pq */
-  probs(stars){
-    const w = stars.map(s => this.STAR_W[s] || 1), T = w.reduce((a, b) => a + b, 0), pw = w.map(x => x / T);
+  probs(stars, mult){
+    const w = stars.map((s, i) => (this.STAR_W[s] || 1) * (mult ? mult[i] : 1)), T = w.reduce((a, b) => a + b, 0), pw = w.map(x => x / T);
     const n = stars.length, pp = new Array(n).fill(0), pq = {}, N = 12000;
     this.combos(n).forEach(([i, j]) => pq[this.ck(i, j)] = 0);
     for(let k = 0; k < N; k++){ const o = this.order(pw); for(let t = 0; t < 3; t++) pp[o[t]] += 1 / N; pq[this.ck(o[0], o[1])] += 1 / N; }
@@ -1125,27 +1157,51 @@ const RACE = {
     const T1 = run * 0.86, fin = new Array(n), photo = R() < 0.35;
     let t = T1;
     race.order.forEach((h, k) => { if(k === 0) fin[h] = T1; else { t += k === 1 ? (photo ? 0.03 + R() * 0.05 : 0.25 + R() * 0.6) : 0.12 + R() * 0.6; fin[h] = t; } });
+    /* 賽中突發事件：配合預先決定的名次演出（只改過程，不改結果） */
+    const ER = this.prng((race.seed || 1) ^ 0x5bd1e995), pick = arr => arr[Math.floor(ER() * arr.length)];
+    const all = race.order.slice(), others = all.slice(1);
+    let events = [];
+    if(ER() < 0.40){ const h = pick(all); events.push({ type: "slow", h, d: 0.7 + ER() * 0.5 }); }
+    if(ER() < 0.35){ const h = ER() < 0.3 ? all[0] : pick(others); events.push({ type: "stumble", h, u: 0.35 + ER() * 0.3 }); }
+    if(ER() < 0.25){ const h = pick(all); let h2 = pick(all); if(h2 === h) h2 = all[(all.indexOf(h) + 1) % n]; events.push({ type: "bump", h, h2, u: 0.34 + ER() * 0.24 }); }
+    if(ER() < 0.30){ const h = pick(all.slice(0, 3)); events.push({ type: "surge", h, u: 0.83 + ER() * 0.06 }); }
+    if(!events.length){ const h = pick(all); events.push(ER() < 0.5 ? { type: "slow", h, d: 0.8 } : { type: "stumble", h: pick(others), u: 0.5 }); }
+    events = events.slice(0, 3);
+    const fx = Array.from({ length: n }, () => []);
+    events.forEach(e => { fx[e.h].push(e); if(e.h2 != null) fx[e.h2].push(e); });
     const bump = (u, c, w) => Math.exp(-Math.pow((u - c) / w, 2));
     const cum = [], burst = [];
     for(let h = 0; h < n; h++){
       const st = this.STYLE[h % this.STYLE.length], f1 = 0.8 + R() * 1.2, f2 = 2.2 + R() * 2, a = R() * 6.28, b = R() * 6.28;
-      const wig = st === "chaos" ? 0.22 : 0.1, bc = 0.68 + R() * 0.14;
+      const wig = st === "chaos" ? 0.22 : 0.1, bc = 0.68 + R() * 0.14, T = fin[h];
       const c = [0]; let acc = 0;
       for(let k = 1; k <= N; k++){
         const u = (k - 0.5) / N;
         let s = 1 + wig * Math.sin(6.283 * f1 * u + a) + 0.05 * Math.sin(6.283 * f2 * u + b);
         if(st === "front") s += 0.32 * Math.pow(1 - u, 1.6) - 0.08;
         if(st === "closer") s += 0.55 * bump(u, bc, 0.09) - 0.06;
-        s *= Math.min(1, 0.3 + u * 7);
-        acc += Math.max(0.2, s); c.push(acc);
+        s = Math.max(0.2, s * Math.min(1, 0.3 + u * 7));
+        fx[h].forEach(e => {
+          if(e.type === "slow" && u * T < e.d) s *= 0.12;
+          if(e.type === "stumble") s *= 1 - 0.7 * bump(u * T, e.u * T, 0.45);
+          if(e.type === "bump") s *= 1 - 0.45 * bump(u * T, e.u * T, 0.4);
+          if(e.type === "surge") s *= 1 + 0.7 * bump(u, e.u, 0.05);
+        });
+        acc += Math.max(0.02, s); c.push(acc);
       }
       cum.push(c.map(x => x / acc));
       burst.push(st === "closer" ? bc : null);
     }
+    /* 事件發生的比賽時間（秒），給字幕和動畫用 */
+    events.forEach(e => { e.t = e.type === "slow" ? 0.2 : e.u * fin[e.h]; });
     const last = Math.max(...fin);
-    const p = { fin, cum, N, photo, burst, slowA: T1 - 0.45, slowB: T1 + 0.2 };
-    p.total = this.toReal(p, last) + 1.2 + (photo ? 1.8 : 0);
+    const p = { fin, cum, N, photo, burst, events, slowA: T1 - 0.45, slowB: T1 + 0.2 };
+    p.total = this.toReal(p, last) + 1.2 + (p.photo ? 1.8 : 0);
     return p;
+  },
+  EVENT_TXT(e, names){
+    const nm = h => (h + 1) + " 號 " + names[h];
+    return e.type === "slow" ? nm(e.h) + " 出閘慢了！" : e.type === "stumble" ? nm(e.h) + " 失蹄踉蹌！" : e.type === "bump" ? (e.h + 1) + " 號、" + (e.h2 + 1) + " 號 擦撞卡位！" : nm(e.h) + " 最後暴衝！";
   },
   /* 實際經過秒數 → 比賽時間（照片判定時放慢） */
   toRace(p, e){ if(!p.photo || e <= p.slowA) return e; const span = p.slowB - p.slowA; if(e <= p.slowA + span * this.SLOW) return p.slowA + (e - p.slowA) / this.SLOW; return e - span * (this.SLOW - 1); },
@@ -1450,10 +1506,21 @@ function renderHorse(full){
   if(view === "open"){ $("rCd").textContent = fmtCd(r.closeAt - now); $("rBar").style.width = Math.max(0, Math.min(100, (r.closeAt - now) / (r.closeAt - r.openAt) * 100)) + "%"; }
   if(view === "idle"){ const nx = nextSchedule(); const e = $("rNext"); if(e) e.textContent = nx ? fmtCd(nx - now) : "--"; }
 }
+const styleTag = i => { const st = HORSE.styleOf(i); return '<span class="stag st-' + st + '">' + HORSE.STYLE_NAME[st] + '</span>'; };
+function newsHtml(r, i){
+  const nw = (r && r.news || []).find(x => x.h === i); if(!nw) return "";
+  const N = HORSE.NEWS[nw.i], cls = N.mystery ? "nq" : N.m > 1 ? "nup" : "ndn", ic = N.mystery ? "？" : N.m > 1 ? "▲" : "▼";
+  return '<div class="hnews ' + cls + '">' + ic + ' ' + esc(N.t) + '</div>';
+}
+function weatherHtml(r){
+  const W = HORSE.WEATHER.find(w => w.id === r.weather); if(!W) return "";
+  const ic = { fine: "☀", soft: "☁", heavy: "☂" }[W.id];
+  return '<div class="deco wbox"><span class="wic">' + ic + '</span><div><div class="gold">今日天氣　' + W.name + '</div><div class="muted">' + W.note + '</div></div></div>';
+}
 function lineupHtml(r){
   const c = GC.cfg.horse, names = (r && r.names) || c.names;
   return names.map((n, i) => '<div class="hcard"><div class="hsilk">' + silkSvg(i) + '<span class="hnum" style="background:' + HORSE_COLORS[i] + '">' + (i+1) + '</span></div>' +
-    '<div class="hinfo"><div class="hname">' + esc(n) + '</div><div class="hjk">騎師 ' + esc((c.jockeys || [])[i] || "") + (r && r.stars ? "　" + stars(r.stars[i]) : "") + '</div><div class="hblurb">' + esc((c.blurbs || [])[i] || "") + '</div></div></div>').join("");
+    '<div class="hinfo"><div class="hname">' + esc(n) + styleTag(i) + '</div><div class="hjk">騎師 ' + esc((c.jockeys || [])[i] || "") + (r && r.stars ? "　" + stars(r.stars[i]) : "") + '</div><div class="hblurb">' + esc((c.blurbs || [])[i] || "") + '</div></div></div>').join("");
 }
 function horseHtml(view, r){
   const c = GC.cfg.horse;
@@ -1469,10 +1536,11 @@ function horseHtml(view, r){
     const names = r.names;
     return '<div class="row" style="margin-top:10px"><span class="tag">第 ' + r.no + ' 場</span><span class="tag" id="rMineTot">已押 ' + money(myTotal()) + ' / ' + money(c.maxBet) + '</span></div>' +
       '<div class="center" style="margin-top:8px"><div class="muted" style="letter-spacing:.3em">截 止 下 注</div><div class="cd" id="rCd">--</div><div class="bbar"><i id="rBar"></i></div><div class="muted" id="rPool" style="margin-top:4px">全場彩池 0</div></div>' +
+      weatherHtml(r) +
       '<div class="seg" id="rType"><button data-t="w">獨贏</button><button data-t="p">位置</button><button data-t="q">連贏</button></div>' +
       '<div class="muted center" id="rTypeHelp" style="margin-top:6px"></div>' +
       '<div class="hlist">' + names.map((n, i) => '<div class="hcard sel-able" data-h="' + i + '"><div class="hsilk">' + silkSvg(i) + '<span class="hnum" style="background:' + HORSE_COLORS[i] + '">' + (i+1) + '</span></div>' +
-        '<div class="hinfo"><div class="hname">' + esc(n) + '</div><div class="hjk">' + stars(r.stars[i]) + '　騎師 ' + esc((c.jockeys || [])[i] || "") + '</div><div class="hblurb">' + esc((c.blurbs || [])[i] || "") + '</div></div>' +
+        '<div class="hinfo"><div class="hname">' + esc(n) + styleTag(i) + '</div><div class="hjk">' + stars(r.stars[i]) + '　騎師 ' + esc((c.jockeys || [])[i] || "") + '</div>' + (newsHtml(r, i) || '<div class="hblurb">' + esc((c.blurbs || [])[i] || "") + '</div>') + '</div>' +
         '<div class="hodds"><div class="ho" id="ho' + i + '">--</div><div class="hmy" id="hm' + i + '"></div></div></div>').join("") + '</div>' +
       '<div class="deco qsel" id="rQ" style="display:none"></div>' +
       '<div class="chips" id="rChips">' + c.chips.map(v => '<div class="chip' + (v === selChip ? " on" : "") + '" data-v="' + v + '">' + v + '</div>').join("") + '</div>' +
@@ -1495,9 +1563,19 @@ function horseHtml(view, r){
     '<div class="deco fodds"><div class="row"><span>獨贏　' + (o[0]+1) + ' 號</span>' + oddsLine("w", "h" + o[0]) + '</div>' +
     o.slice(0, 3).map(h => '<div class="row"><span>位置　' + (h+1) + ' 號</span>' + oddsLine("p", "h" + h) + '</div>').join("") +
     '<div class="row"><span>連贏　' + HORSE.label("q", qk) + '</span>' + oddsLine("q", qk) + '</div></div>' +
+    eventsHtml(r) +
     '<div class="deco slip">' + (me.lines.length ? '<div class="gold" style="margin-bottom:4px">我的下注</div>' + me.lines.map(l => '<div class="row"><span>' + HORSE.TYPE[l.t] + '　' + HORSE.label(l.t, l.k) + '　' + money(l.a) + '</span><span class="' + (l.st === "lose" ? "minus" : "plus") + '">' + (l.st === "win" ? "中！＋" + money(l.got) : l.st === "refund" ? "退回 " + money(l.got) : "未中") + '</span></div>').join("") : '<div class="muted center">這場你沒有下注</div>') + '</div>' +
     (tot ? '<div class="pkres' + (me.total > 0 ? "" : " lose") + '">' + (me.total > 0 ? "共贏得 ＋" + money(me.total) : "沒押中，下一場再來") + '</div>' : '') +
     '<div class="muted center" style="margin-top:8px">' + (nextSchedule() ? "下一場 " + fmtClock(nextSchedule()) + " 開盤" : "今晚賽馬已全部結束") + '</div>';
+}
+function eventsHtml(r){
+  if(!r.order || !r.seed) return "";
+  const evs = RACE.plan(r).events.map(e => RACE.EVENT_TXT(e, r.names)), W = HORSE.WEATHER.find(w => w.id === r.weather);
+  let h = '<div class="deco evbox"><div class="gold" style="margin-bottom:4px">本場紀錄</div>';
+  if(W) h += '<div>天氣：' + W.name + '</div>';
+  h += evs.map(t => '<div>・' + esc(t) + '</div>').join("");
+  if(r.myst){ const h0 = r.myst.h; h += '<div class="mreveal">馴馬師的驚喜揭曉：' + (h0 + 1) + ' 號 ' + esc(r.names[h0]) + ' 其實是 ' + (r.myst.up ? '<span class="plus">▲ 狀態大好（+30%）</span>' : '<span class="minus">▼ 狀態不佳（−30%）</span>') + '</div>'; }
+  return h + '</div>';
 }
 function mineLine(r){
   const ls = []; ["w","p","q"].forEach(t => Object.entries(myBets[t] || {}).forEach(([k, a]) => { if(a > 0) ls.push(HORSE.TYPE[t] + " " + HORSE.label(t, k) + " " + money(a)); }));
@@ -1582,8 +1660,12 @@ function buildCaps(r, p){
     [[COURSE.bend, "進入彎道！"], [COURSE.home, "進入直線！"], [0.88, "最後衝刺！"]].forEach(([th, txt]) => { if(!done[txt] && lead >= th){ done[txt] = 1; caps.push({ t, txt }); } });
   }
   r.order.slice(0, 3).forEach(h => { if(p.burst[h] != null){ const t = p.burst[h] * p.fin[h] - 1.2; if(t > 3) caps.push({ t, txt: (h+1) + " 號 " + names[h] + " 爆發！" }); } });
+  (p.events || []).forEach(e => caps.push({ t: Math.max(0.6, e.t - (e.type === "slow" ? -0.6 : 0.2)), txt: RACE.EVENT_TXT(e, names) }));
   if(p.photo) caps.push({ t: p.slowA, txt: "難分高下！" });
-  caps.push({ t: p.fin[r.order[0]] + (p.photo ? 0.25 : 0), txt: (r.order[0]+1) + " 號 " + names[r.order[0]] + " 衝線！" });
+  /* 大逆轉：剩約 250 公尺時，冠軍還不在前兩名 */
+  let tc = 0; for(let t = 0; t < p.fin[r.order[0]]; t += 0.1){ if(Math.max(...names.map((_, h) => RACE.pos(p, h, t))) >= 0.845){ tc = t; break; } }
+  const rk = names.map((_, h) => h).sort((a, b) => RACE.pos(p, b, tc) - RACE.pos(p, a, tc)).indexOf(r.order[0]);
+  caps.push({ t: p.fin[r.order[0]] + (p.photo ? 0.25 : 0), txt: (rk >= 2 ? "大逆轉！" : "") + (r.order[0]+1) + " 號 " + names[r.order[0]] + " 衝線！" });
   return caps.sort((a, b) => a.t - b.t);
 }
 function drawHorse(cx, x, y, s, ph, coat, silk, num){
@@ -1763,7 +1845,14 @@ function drawSide(r, p, t, e, pos, lead){
     const x = sx(h) - cam, y = trackTop + (h + 0.86) * laneH;
     if(x < -80 || x > W + 80) continue;
     const s = Math.min(0.85, laneH / 50) * (0.9 + h * 0.035);
+    let rot = 0, dy = 0, spark = false;
+    if(p) (p.events || []).forEach(ev => { const dt = t - ev.t;
+      if(ev.type === "stumble" && ev.h === h && dt > -0.2 && dt < 0.9){ const k = Math.sin(Math.max(0, dt + 0.2) / 1.1 * Math.PI); rot = 0.28 * k; dy = 7 * k * s; }
+      if(ev.type === "bump" && (ev.h === h || ev.h2 === h) && dt > -0.1 && dt < 0.6){ rot = (ev.h === h ? -1 : 1) * 0.1 * Math.sin((dt + 0.1) / 0.7 * Math.PI); spark = dt < 0.35; } });
+    cx.save(); cx.translate(x, y + dy); cx.rotate(rot); cx.translate(-x, -y);
     drawHorse(cx, x, y, s, p && t > 0 ? pos(h) * L / 9 : 0, COATS[h], SILKS[h], String(h + 1));
+    cx.restore();
+    if(spark){ cx.fillStyle = "rgba(255,246,207,.9)"; for(let k = 0; k < 6; k++){ const a = k * 1.047 + t * 8; cx.beginPath(); cx.arc(x + 14 * s + Math.cos(a) * 14 * s, y - 40 * s + Math.sin(a) * 14 * s, 2.5, 0, 6.283); cx.fill(); } }
   }
   rail(trackTop + laneH * n - 2, true);
   cx.restore();
