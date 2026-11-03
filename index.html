@@ -212,8 +212,11 @@ button,input,select{font-family:inherit;font-size:16px}
 .plines polyline{fill:none;stroke:rgba(192,38,45,.35);stroke-width:2;vector-effect:non-scaling-stroke}
 .plines polyline.on{stroke:#ffd76a;stroke-width:4;filter:drop-shadow(0 0 4px #ffd76a);animation:lineblink .5s ease-in-out 4}
 @keyframes lineblink{50%{stroke:#fff6cf}}
-.plines polyline.ref{stroke:#cfd6dc;stroke-width:3;stroke-dasharray:6 4}
-.sref{font-family:var(--serif);font-size:clamp(14px,4.4vw,17px);color:#cfd6dc;font-weight:400;letter-spacing:.05em}
+.cell.glow7{animation:glow7 .55s ease-in-out 5;position:relative;z-index:1}
+@keyframes glow7{0%,100%{text-shadow:0 0 0 rgba(255,215,106,0)}50%{text-shadow:0 0 8px #fff3c4,0 0 18px #ffd76a,0 0 30px #ffb800;transform:scale(1.12)}}
+.cell.glowwin{animation:glowwin .5s ease-in-out 4}
+@keyframes glowwin{50%{text-shadow:0 0 10px #fff3c4,0 0 22px #ffd76a;transform:scale(1.1)}}
+.sref{font-family:var(--serif);font-size:clamp(14px,4.4vw,17px);color:#f3dc9c;font-weight:400;letter-spacing:.05em}
 .cab.tension .rwin:last-of-type{box-shadow:0 0 0 2px #ffd76a,0 0 16px #ffd76a}
 .lever{position:absolute;right:0;top:22%;width:26px;height:58%;cursor:pointer}
 .lever .rod{position:absolute;left:50%;bottom:10px;width:6px;height:calc(100% - 20px);transform:translateX(-50%);transform-origin:50% 100%;background:linear-gradient(90deg,#8a8a8a,#eee,#8a8a8a);border-radius:3px;transition:transform .25s}
@@ -2090,6 +2093,13 @@ function bigWin(title, amt){
   clearTimeout(bigWin._t); bigWin._t = setTimeout(() => o.classList.remove("on"), 4200);
 }
 $("bigwin").onclick = () => $("bigwin").classList.remove("on");
+/* 讓某條線上的格子發光：退回線只亮那兩個 7，中獎線三格都亮 */
+function glowCells(w, only7){
+  SLOT_LINES[w.li].forEach((row, reel) => {
+    if(only7 && w.three[reel] !== "7") return;
+    const el = $("st" + reel).children[row]; if(el) el.classList.add(only7 ? "glow7" : "glowwin");
+  });
+}
 async function doSpin(){
   if(slotBusy) return;
   const s = GC.cfg.slot, bet = slotBet;
@@ -2111,11 +2121,11 @@ async function doSpin(){
   await p0; cab.classList.remove("tension");
   const ls = $$("#plines polyline");
   if(mult && win - bet <= 0){
-    /* 只有「兩個 7」退回押注：用銀色線、不閃燈，避免看起來像中獎 */
-    ev.wins.forEach(w => ls[w.li].classList.add("ref"));
+    /* 只有「兩個 7」退回押注：不畫線、機台不閃燈，只讓那兩個 7 發光 */
+    ev.wins.forEach(w => glowCells(w, true));
     $("sRes").innerHTML = '<span class="sref">' + SLOT_LINE_NAMES[ev.wins[0].li] + '兩個 7・退回押注 ' + money(win) + '</span>';
   } else if(mult){
-    ev.wins.forEach(w => ls[w.li].classList.add(w.m > 1 ? "on" : "ref"));
+    ev.wins.forEach(w => { if(w.m > 1) ls[w.li].classList.add("on"); glowCells(w, w.m <= 1); });
     cab.classList.add("win"); setTimeout(() => cab.classList.remove("win"), 2600);
     countUp($("sRes"), win - bet, 900, ev.wins.length > 1 ? ev.wins.length + " 條線！＋" : "＋");
     const jack = ev.wins.some(w => w.three[0] === "7" && w.three[1] === "7" && w.three[2] === "7");
